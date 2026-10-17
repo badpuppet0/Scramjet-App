@@ -68,6 +68,50 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
   font-size: .88rem; max-width: calc(100vw - 1.8rem); }
 .toast[hidden] { display: none; }
 
+/* status chip */
+.status { position: fixed; left: max(.9rem, env(safe-area-inset-left)); bottom: max(.9rem, env(safe-area-inset-bottom)); z-index: 3;
+  display: flex; align-items: center; gap: .55rem; max-width: min(22rem, calc(100vw - 1.8rem));
+  background: rgba(11,14,23,.78); border: 1px solid var(--edge); border-radius: 999px; padding: .4rem .85rem .4rem .7rem;
+  color: var(--steel); font-size: .82rem; line-height: 1.25; backdrop-filter: blur(6px); }
+.status svg { width: 1rem; height: 1rem; flex: none; }
+.dot { width: .55rem; height: .55rem; border-radius: 50%; flex: none; background: #6b7488; }
+.status[data-s="up"] .dot { background: #3ddc84; box-shadow: 0 0 0 0 rgba(61,220,132,.5); animation: pulse 2.4s infinite; }
+.status[data-s="warn"] .dot { background: #f5c542; }
+.status[data-s="down"] .dot { background: #ef5350; }
+.status[data-s="up"] { color: #b6c4bd; }
+.status[data-s="warn"] { color: #e6d49a; }
+.status[data-s="down"] { color: #f0b4b4; }
+@keyframes pulse { 70% { box-shadow: 0 0 0 .45rem rgba(61,220,132,0); } 100% { box-shadow: 0 0 0 0 rgba(61,220,132,0); } }
+@media (max-width: 640px) { .note { bottom: 3.4rem; } }
+
+/* change log */
+.cog.log { right: 3.9rem; }
+.overlay { position: fixed; inset: 0; z-index: 5; display: grid; place-items: center; padding: 1rem;
+  background: rgba(0,0,0,.62); backdrop-filter: blur(4px); }
+.overlay[hidden] { display: none; }
+.panel { width: min(32rem, 100%); max-height: min(80vh, 36rem); display: flex; flex-direction: column;
+  background: var(--panel); border: 1px solid var(--edge); border-radius: 16px; overflow: hidden; }
+.phead { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.1rem .6rem; }
+.phead h2 { font-size: 1.05rem; font-weight: 500; }
+.phead button { background: none; border: 0; color: var(--steel); font-size: 1.5rem; line-height: 1; cursor: pointer;
+  width: 2rem; height: 2rem; border-radius: 8px; }
+.phead button:hover { color: var(--ink); background: #151a28; }
+.tabs { display: flex; gap: .3rem; padding: 0 1.1rem; border-bottom: 1px solid var(--edge); }
+.tabs button { background: none; border: 0; border-bottom: 2px solid transparent; color: var(--steel); font: inherit;
+  font-size: .9rem; padding: .5rem .7rem; cursor: pointer; margin-bottom: -1px; }
+.tabs button.on { color: var(--ink); border-bottom-color: var(--blue); }
+.pbody { padding: 1rem 1.1rem 1.2rem; overflow: auto; }
+.pbody[hidden] { display: none; }
+.pbody h3 { font-size: 1rem; font-weight: 600; }
+.pbody h3 span { color: var(--blue); font-weight: 500; margin-left: .4rem; }
+.pbody .date { color: var(--steel); font-size: .8rem; margin: .15rem 0 .7rem; }
+.pbody ul { padding-left: 1.1rem; color: #b8c1d4; font-size: .92rem; }
+.pbody li { margin: .25rem 0; }
+.pbody dl { font-size: .92rem; }
+.pbody dt { font-weight: 500; margin-top: .8rem; }
+.pbody dt:first-child { margin-top: 0; }
+.pbody dd { margin: 0; color: #9aa3b8; }
+
 /* ---------- browsing ---------- */
 #browse { position: fixed; inset: 0; z-index: 2; display: flex; flex-direction: column; background: var(--void); }
 #browse[hidden] { display: none; }
@@ -96,13 +140,45 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
 .fail button:hover { border-color: var(--blue-dim); }
 
 @media (max-width: 520px) { #btn-fwd, #btn-reload { display: none; } }
-@media (prefers-reduced-motion: reduce) { .shake { animation: none; } .load.on { animation-duration: 0s; width: 92%; } }
+@media (prefers-reduced-motion: reduce) { .shake, .status .dot { animation: none; } .load.on { animation-duration: 0s; width: 92%; } }
 </style>
 </head>
 <body>
 <canvas id="sky" aria-hidden="true"></canvas>
 <button class="cog" id="cog" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+<button class="cog log" id="logbtn" aria-label="Change log" title="Change log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h7"/></svg></button>
 <div class="toast" id="toast" role="status" hidden></div>
+
+<div class="status" id="status" data-s="check" role="status" aria-live="polite">
+  <span class="dot"></span>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="6" rx="1.5"/><rect x="3" y="14" width="18" height="6" rx="1.5"/><path d="M7 7h.01M7 17h.01"/></svg>
+  <span id="status-text">Checking server…</span>
+</div>
+
+<div class="overlay" id="log" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="log-title">
+    <div class="phead"><h2 id="log-title">Change log</h2><button id="log-close" aria-label="Close">&times;</button></div>
+    <div class="tabs"><button class="on" data-tab="updates">Updates</button><button data-tab="credits">Credits</button></div>
+    <div class="pbody" id="tab-updates">
+      <h3>TSW v2 1.0<span>Site launch</span></h3>
+      <p class="date">October 2026</p>
+      <ul>
+        <li>TSW v2 goes live with a real web proxy built on the Scramjet engine.</li>
+        <li>Search bar and address bar, with back, forward, reload and home.</li>
+        <li>Shortcuts for TikTok, Instagram and GeForce NOW.</li>
+        <li>Server status in the bottom left corner.</li>
+      </ul>
+    </div>
+    <div class="pbody" id="tab-credits" hidden>
+      <dl>
+        <dt>Scramjet</dt><dd>The web proxy engine, by Mercury Workshop (MIT license).</dd>
+        <dt>Scramjet-App</dt><dd>The server this site is built on, by Mercury Workshop (AGPL-3.0 license).</dd>
+        <dt>libcurl-transport, bare-mux and wisp-js</dt><dd>The connection layer that carries proxied traffic, by Mercury Workshop.</dd>
+        <dt>Fastify</dt><dd>The web server framework.</dd>
+      </dl>
+    </div>
+  </div>
+</div>
 
 <main id="home">
   <div class="hero">
@@ -198,6 +274,52 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
   }
   addEventListener('resize', size);
   size(); requestAnimationFrame(frame);
+})();
+
+/* ===================== server status ===================== */
+/* Set STATUS_NOTICE to a short message to show the yellow "maintenance" state, e.g.
+   var STATUS_NOTICE = 'Maintenance tonight. Sites may fail.';
+   Set it back to '' to return to green. Red and green are detected automatically. */
+var STATUS_NOTICE = '';
+(function () {
+  var box = document.getElementById('status'), text = document.getElementById('status-text');
+  var engineOk = null, pingOk = true;
+  function paint() {
+    var st, msg;
+    if (engineOk === false || !pingOk) { st = 'down'; msg = 'Proxy servers down'; }
+    else if (engineOk === null) { st = 'check'; msg = 'Checking server\u2026'; }
+    else if (STATUS_NOTICE) { st = 'warn'; msg = STATUS_NOTICE; }
+    else { st = 'up'; msg = 'Active'; }
+    box.setAttribute('data-s', st); text.textContent = msg;
+  }
+  if (window.TSWEngine && window.TSWEngine.ready) {
+    Promise.resolve(window.TSWEngine.ready).then(function () { engineOk = true; paint(); },
+                                                 function () { engineOk = false; paint(); });
+  } else { engineOk = false; }
+  function ping() {
+    fetch('/', { method: 'HEAD', cache: 'no-store' })
+      .then(function (r) { pingOk = r.ok; }, function () { pingOk = false; })
+      .then(paint);
+  }
+  setInterval(ping, 60000); ping(); paint();
+})();
+
+/* ===================== change log panel ===================== */
+(function () {
+  var panel = document.getElementById('log'), openBtn = document.getElementById('logbtn');
+  function show() { panel.hidden = false; document.getElementById('log-close').focus(); }
+  function hide() { panel.hidden = true; openBtn.focus(); }
+  openBtn.addEventListener('click', show);
+  document.getElementById('log-close').addEventListener('click', hide);
+  panel.addEventListener('click', function (ev) { if (ev.target === panel) hide(); });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && !panel.hidden) hide(); });
+  panel.querySelectorAll('.tabs button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      panel.querySelectorAll('.tabs button').forEach(function (x) { x.classList.toggle('on', x === b); });
+      document.getElementById('tab-updates').hidden = b.dataset.tab !== 'updates';
+      document.getElementById('tab-credits').hidden = b.dataset.tab !== 'credits';
+    });
+  });
 })();
 
 /* ===================== navigation UI ===================== */
