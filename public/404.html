@@ -1,27 +1,90 @@
-<!doctype html>
-<html>
-	<head>
-		<meta charset="utf-8" />
-		<meta
-			name="viewport"
-			content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
-		/>
-		<title>Scramjet | Error</title>
-		<base href="/" />
-		<link rel="shortcut icon" content="favicon.ico" />
-		<link rel="stylesheet" href="index.css" />
-	</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Page not found | TSW v2</title>
+<meta name="theme-color" content="#020308">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2305070f'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%235aa2ff'/%3E%3C/svg%3E">
+<style>
+:root { --void: #020308; --edge: #1b2130; --steel: #6b7488; --ink: #d5dcec; --blue: #5aa2ff; }
+* { box-sizing: border-box; margin: 0; }
+html, body { height: 100%; background: var(--void); color: var(--ink); overflow: hidden;
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+canvas { position: fixed; inset: 0; width: 100%; height: 100%; }
+main { position: relative; z-index: 1; height: 100%; display: grid; place-items: center; padding: 1.5rem; text-align: center; }
+.code { font-size: clamp(5rem, 24vw, 11rem); font-weight: 200; letter-spacing: .12em; padding-left: .12em; line-height: 1;
+  text-shadow: 0 0 60px rgba(90,162,255,.35); }
+.code b { color: var(--blue); font-weight: 300; }
+h1 { font-size: 1.3rem; font-weight: 500; margin: 1rem 0 .4rem; }
+p { color: var(--steel); max-width: 26rem; margin: 0 auto; }
+.row { display: flex; flex-wrap: wrap; justify-content: center; gap: .7rem; margin-top: 1.6rem; }
+a.btn { display: inline-block; text-decoration: none; border-radius: 999px; padding: .65rem 1.4rem; font-size: .95rem;
+  border: 1px solid var(--edge); color: var(--ink); background: rgba(11,14,23,.82); transition: border-color .2s; }
+a.btn:hover { border-color: #2a4f86; }
+a.btn.main { background: var(--blue); color: #03101f; border-color: var(--blue); }
+a.btn.main:hover { background: #7cb5ff; }
+</style>
+</head>
+<body>
+<canvas id="sky" aria-hidden="true"></canvas>
+<main>
+  <div>
+    <div class="code">4<b>0</b>4</div>
+    <h1 id="t">Page not found</h1>
+    <p id="d">That page does not exist on TSW v2. It may have been moved, or the address has a typo.</p>
+    <div class="row">
+      <a class="btn main" href="/">Back to TSW v2</a>
+      <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLScupiUZuqQsngFai_QPQRWn06LpuZy3VGZOEyIUY0DAZ0qJxw/viewform" target="_blank" rel="noopener noreferrer">Report a problem</a>
+    </div>
+  </div>
+</main>
 
-	<body>
-		<div class="logo-wrapper left-margin">
-			<h1>Scramjet | Error</h1>
-		</div>
-		<div class="desc left-margin">
-			<p>The server could not route your request.</p>
-		</div>
-		<footer>
-			<a title="License information" href="credits.html">Credits</a>
-			<span>Scramjet &copy; MW 2025</span>
-		</footer>
-	</body>
+<!-- If this page was reached through a proxied address (the service worker was not active yet), reconnect and retry once. -->
+<script src="/baremux/index.js"></script>
+<script src="/scram/scramjet.all.js"></script>
+<script src="/register-sw.js"></script>
+<script src="/engine.js"></script>
+<script>
+(function () {
+  var c = document.getElementById('sky'), g = c.getContext('2d'), stars = [], w, h;
+  var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function size() {
+    var dpr = Math.min(devicePixelRatio || 1, 2); w = innerWidth; h = innerHeight;
+    c.width = w * dpr; c.height = h * dpr; g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    stars = [];
+    for (var i = 0, n = Math.round(w * h / 5200); i < n; i++)
+      stars.push({ x: Math.random() * w, y: Math.random() * h, r: Math.random() < .12 ? 1.6 : Math.random() * .9 + .5,
+        a: Math.random() * .35 + .65, s: Math.random() * 2 + .6, p: Math.random() * 6.28 });
+  }
+  function frame(t) {
+    g.clearRect(0, 0, w, h); g.fillStyle = '#fff';
+    for (var i = 0; i < stars.length; i++) {
+      var s = stars[i]; g.globalAlpha = s.a * (still ? 1 : .8 + .2 * Math.sin(t / 1000 * s.s + s.p));
+      g.beginPath(); g.arc(s.x, s.y, s.r, 0, 6.2832); g.fill();
+    }
+    requestAnimationFrame(frame);
+  }
+  addEventListener('resize', size); size(); requestAnimationFrame(frame);
+
+  if (location.pathname.indexOf('/scramjet/') === 0) {
+    document.getElementById('t').textContent = 'Reconnecting\u2026';
+    document.getElementById('d').textContent = 'Getting the proxy ready. If this stays here, go back to TSW v2 and open the site again.';
+    var last = 0;
+    try { last = +sessionStorage.getItem('tsw404') || 0; } catch (e) {}
+    if (Date.now() - last > 10000 && window.TSWEngine && window.BareMux && navigator.serviceWorker) {
+      try { sessionStorage.setItem('tsw404', String(Date.now())); } catch (e) {}
+      /* absolute /sw.js, because this page's own address is deep inside /scramjet/ */
+      navigator.serviceWorker.register('/sw.js').then(function () { return navigator.serviceWorker.ready; }).then(function () {
+        var conn = new BareMux.BareMuxConnection('/baremux/worker.js');
+        var wisp = (location.protocol === 'https:' ? 'wss' : 'ws') + '://' + location.host + '/wisp/';
+        return conn.getTransport().then(function (cur) {
+          if (cur !== '/libcurl/index.mjs') return conn.setTransport('/libcurl/index.mjs', [{ websocket: wisp }]);
+        });
+      }).then(function () { location.reload(); }, function () {});
+    }
+  }
+})();
+</script>
+</body>
 </html>

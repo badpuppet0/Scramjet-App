@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>TSW v2</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#020308">
+<link rel="apple-touch-icon" href="/icon-192.png">
 <link rel="icon" id="fav" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2305070f'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%235aa2ff'/%3E%3C/svg%3E">
 <style>
 :root {
@@ -172,7 +175,7 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
   border-radius: 999px; padding: .5rem 1.2rem; font: inherit; cursor: pointer; }
 .fail button:hover { border-color: var(--blue-dim); }
 
-@media (max-width: 520px) { #btn-fwd, #btn-reload { display: none; } }
+@media (max-width: 480px) { #btn-fwd, #btn-newtab { display: none; } }
 @media (prefers-reduced-motion: reduce) { .shake, .status .dot, .spin { animation: none; } .load.on { animation-duration: 0s; width: 92%; } }
 
 /* ---- v1.2 additions ---- */
@@ -195,6 +198,48 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
 .pbody .kv div { display: flex; justify-content: space-between; gap: 1rem; padding: .65rem 0; border-bottom: 1px solid var(--edge); }
 .pbody .kv dt { color: var(--steel); font-size: .9rem; margin: 0; font-weight: 400; }
 .pbody .kv dd { margin: 0; color: var(--ink); text-align: right; word-break: break-all; font-variant-numeric: tabular-nums; }
+
+/* ---- v1.3 additions ---- */
+.note a { color: #6f84ad; text-decoration: underline; }
+.note a:hover { color: #9ac4ff; }
+.spinning svg { animation: spin .8s linear infinite; }
+.diag { position: absolute; z-index: 4; left: 50%; transform: translateX(-50%);
+  top: calc(var(--bar) + env(safe-area-inset-top, 0px) + .8rem); width: min(30rem, calc(100% - 1.6rem));
+  background: rgba(14,18,30,.97); border: 1px solid #44303a; border-radius: 14px; padding: 1rem 1.1rem;
+  box-shadow: 0 12px 40px rgba(0,0,0,.55); }
+.diag[hidden] { display: none; }
+.diag h3 { font-size: 1rem; font-weight: 600; margin: 0 1.6rem .3rem 0; color: #f0c4c4; }
+.diag.soft { border-color: var(--edge); }
+.diag.soft h3 { color: var(--ink); }
+.diag p { color: #aab3c6; font-size: .9rem; }
+.diag .row { flex-wrap: wrap; gap: .5rem; margin-top: .9rem; }
+.diag .plain, .diag a.plain { display: inline-block; margin-top: 0; font-size: .88rem; padding: .4rem .9rem; text-decoration: none; color: var(--ink); }
+.diag .x { position: absolute; top: .4rem; right: .5rem; background: none; border: 0; color: var(--steel); font-size: 1.5rem;
+  line-height: 1; cursor: pointer; width: 2rem; height: 2rem; }
+.diag .x:hover { color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { .spinning svg { animation: none; } }
+@media (pointer: coarse), (max-width: 640px) {
+  :root { --bar: 3.9rem; }
+  .cog { width: 3.4rem; height: 3.4rem; }
+  .cog svg { width: 1.7rem; height: 1.7rem; }
+  .cog.log { right: 4.8rem; }
+  .cog.games { right: 8.7rem; }
+  .links > button, .chip button { padding-top: .75rem; padding-bottom: .75rem; font-size: 1rem; }
+  .chip .x { padding: .75rem .9rem .75rem .4rem; }
+  #add-link { padding: .75rem 1.2rem; }
+  .field input { font-size: 1rem; padding: .8rem 0; }
+  .field .go { width: 3rem; height: 3rem; }
+  .bar button { width: 2.8rem; height: 2.8rem; }
+  .bar svg { width: 1.3rem; height: 1.3rem; }
+  .bar .addr { font-size: 1rem; padding: .6rem 1rem; }
+  .status { padding: .6rem 1rem .6rem .8rem; font-size: .95rem; }
+  .f select, .f input[type=text] { padding: .8rem; font-size: 1rem; }
+  .f .check input { width: 1.4rem; height: 1.4rem; }
+  .phead button { width: 2.8rem; height: 2.8rem; }
+  .tabs button { padding: .8rem 1rem; }
+  .plain, .primary { padding: .7rem 1.3rem; }
+  .diag .plain, .diag a.plain { padding: .65rem 1.1rem; }
+}
 </style>
 </head>
 <body>
@@ -215,8 +260,14 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
     <div class="phead"><h2 id="set-h">Settings</h2><button data-close aria-label="Close">&times;</button></div>
     <div class="pbody f">
       <label for="set-engine">Search engine</label>
-      <select id="set-engine"><option value="ddg">DuckDuckGo</option><option value="google">Google</option><option value="bing">Bing</option></select>
+      <select id="set-engine"><option value="ddg">DuckDuckGo</option><option value="google">Google</option><option value="bing">Bing</option><option value="brave">Brave</option><option value="startpage">Startpage</option><option disabled>Tor (coming soon)</option></select>
       <p class="hint">Google may ask you to prove you are not a robot.</p>
+      <label for="set-bg">Background</label>
+      <select id="set-bg"><option value="stars">Stars</option><option value="ice">Ice waves (interactive)</option><option disabled>Aurora (coming soon)</option><option disabled>More coming soon</option></select>
+      <p class="hint">Ice waves react to your mouse or finger. On the stars background, click a star to make it shine.</p>
+      <label for="set-season">Seasonal effects</label>
+      <select id="set-season"><option value="auto">Automatic</option><option value="snow">Snow</option><option value="bats">Bats</option><option value="off">Off</option></select>
+      <p class="hint">Automatic shows snow in winter and bats around Halloween.</p>
       <label class="check"><input type="checkbox" id="set-stars"> Stars</label>
       <label class="check"><input type="checkbox" id="set-shoot"> Shooting stars and rockets</label>
       <label for="set-title">Tab title</label>
@@ -224,8 +275,9 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
       <label for="set-icon">Tab icon</label>
       <select id="set-icon"><option value="default">TSW v2</option><option value="doc">Document</option><option value="globe">Globe</option><option value="blank">Blank</option></select>
       <p class="hint">The tab title and icon only change the TSW v2 tab.</p>
-      <h4 class="subh">Browser options</h4>
-      <div class="soonrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg><div><b>Tor browser</b><small>Route your browsing through the Tor network.</small></div><span class="badge">Coming soon</span></div>
+      <label>App</label>
+      <button type="button" class="plain" id="install-btn" hidden style="margin-top:0">Install TSW v2 as an app</button>
+      <p class="hint">If the button is not shown, look for an install option in your browser's menu. On iPhone or iPad, tap Share, then Add to Home Screen.</p>
       <p class="hint" style="margin-top:1.2rem">Settings are saved in this browser.</p>
       <button type="button" class="plain" id="set-reset">Reset to defaults</button>
     </div>
@@ -290,7 +342,18 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
     <div class="phead"><h2 id="log-title">Change log</h2><button id="log-close" aria-label="Close">&times;</button></div>
     <div class="tabs"><button class="on" data-tab="updates">Updates</button><button data-tab="credits">Credits</button></div>
     <div class="pbody" id="tab-updates">
-      <h3>TSW v2 1.2<span>Rockets and server info</span></h3>
+      <h3>TSW v2 1.3<span>Backgrounds and polish</span></h3>
+      <p class="date">October 2026</p>
+      <ul>
+        <li>New interactive ice waves background, chosen in Settings. More backgrounds are coming soon.</li>
+        <li>Seasonal effects: snow in winter and bats around Halloween.</li>
+        <li>Click a star to make it shine.</li>
+        <li>Friendly messages explaining why a site did not load.</li>
+        <li>Open in new tab, a spinning reload button, and a new look for the 404 page.</li>
+        <li>Brave and Startpage search, and a Report a broken site link.</li>
+        <li>Bigger touch targets on phones, and TSW v2 can be installed as an app.</li>
+      </ul>
+      <h3 class="older">TSW v2 1.2<span>Rockets and server info</span></h3>
       <p class="date">October 2026</p>
       <ul>
         <li>Tiny rockets now fly across the sky between the shooting stars, and stars sometimes shine.</li>
@@ -346,7 +409,7 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
     </nav>
     <p class="msg" id="home-msg" role="status"></p>
   </div>
-  <p class="note">Some sites block proxies and won't load.</p>
+  <p class="note">Some sites block proxies and won't load. <a href="https://docs.google.com/forms/d/e/1FAIpQLScupiUZuqQsngFai_QPQRWn06LpuZy3VGZOEyIUY0DAZ0qJxw/viewform" target="_blank" rel="noopener noreferrer">Report a broken site</a></p>
 </main>
 
 <section id="browse" hidden>
@@ -355,10 +418,21 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
     <button id="btn-back" title="Back" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
     <button id="btn-fwd" title="Forward" aria-label="Forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
     <button id="btn-reload" title="Reload" aria-label="Reload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.5-5.8M20 4v5h-5"/></svg></button>
+    <button id="btn-newtab" title="Open in new tab" aria-label="Open in new tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></button>
     <input class="addr" id="addr" type="text" inputmode="url" autocapitalize="off" spellcheck="false" aria-label="Address">
     <div class="load" id="load"></div>
   </div>
   <div id="view"></div>
+  <div class="diag" id="diag" hidden role="status">
+    <button class="x" id="diag-x" aria-label="Dismiss">&times;</button>
+    <h3 id="diag-t"></h3>
+    <p id="diag-p"></p>
+    <div class="row">
+      <button class="plain" type="button" id="diag-reload">Reload</button>
+      <button class="plain" type="button" id="diag-tab">Open in new tab</button>
+      <a class="plain" id="diag-report" href="https://docs.google.com/forms/d/e/1FAIpQLScupiUZuqQsngFai_QPQRWn06LpuZy3VGZOEyIUY0DAZ0qJxw/viewform" target="_blank" rel="noopener noreferrer">Report this site</a>
+    </div>
+  </div>
 </section>
 
 <!-- Proxy engine scripts: order matters. These files are served by the Scramjet-App server. -->
@@ -374,14 +448,26 @@ var store = {
   set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
   del: function (k) { try { localStorage.removeItem(k); } catch (e) {} }
 };
-/* ===================== stars + shooting stars + rockets ===================== */
+/* ===================== background: stars / ice waves, seasons, rockets ===================== */
 (function () {
   var c = $('sky'), g = c.getContext('2d');
-  var stars = [], shots = [], puffs = [], shines = [], w = 0, h = 0, dpr = 1, next = 0, nextShine = 1500;
+  var stars = [], shots = [], puffs = [], shines = [], flakes = [], bats = [], ripples = [];
+  var w = 0, h = 0, dpr = 1, next = 0, nextShine = 1500, lastRipple = 0, lastX = 0, lastY = 0, seeded = '';
   var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var COLORS = ['#ffffff', '#ffffff', '#ffffff', '#ffffff', '#eef4ff'];
 
-  function opt() { var o = window.TSWSky || {}; return { stars: o.stars !== false, shoot: o.shoot !== false }; }
+  function opt() {
+    var o = window.TSWSky || {};
+    return { stars: o.stars !== false, shoot: o.shoot !== false, bg: o.bg === 'ice' ? 'ice' : 'stars', season: o.season || 'auto' };
+  }
+  function seasonOf(o) {
+    if (o.season === 'off') return '';
+    if (o.season === 'snow' || o.season === 'bats') return o.season;
+    var d = new Date(), m = d.getMonth(), day = d.getDate();
+    if (m === 11 || m === 0 || m === 1) return 'snow';
+    if ((m === 9 && day >= 20) || (m === 10 && day <= 1)) return 'bats';
+    return '';
+  }
   function size() {
     dpr = Math.min(window.devicePixelRatio || 1, 2);
     w = innerWidth; h = innerHeight;
@@ -394,6 +480,19 @@ var store = {
         r: Math.random() < .12 ? 1.6 : Math.random() * .9 + .5,
         a: Math.random() * .35 + .65, s: Math.random() * 2 + .6, p: Math.random() * 6.28,
         c: COLORS[Math.floor(Math.random() * COLORS.length)] });
+    }
+    seeded = '';
+  }
+  function seed(kind) {
+    var i;
+    if (kind === 'snow') {
+      flakes = [];
+      for (i = 0; i < Math.round(w / 14); i++) flakes.push({ x: Math.random() * w, y: Math.random() * h, r: .8 + Math.random() * 2,
+        vy: .35 + Math.random() * .9, p: Math.random() * 6.28, s: .5 + Math.random() * 1.2 });
+    } else if (kind === 'bats') {
+      bats = [];
+      for (i = 0; i < 5; i++) bats.push({ x: Math.random() * w, y: h * .1 + Math.random() * h * .6,
+        vx: (Math.random() < .5 ? -1 : 1) * (.7 + Math.random() * 1.1), p: Math.random() * 6.28, sc: .9 + Math.random() * .8, d: Math.random() * 6.28 });
     }
   }
   function spawn() {
@@ -430,34 +529,99 @@ var store = {
     g.fillStyle = '#5aa2ff'; g.beginPath(); g.arc(1.5, 0, 1.7, 0, 6.2832); g.fill();
     g.restore();
   }
+  function drawBat(b, t) {
+    var flap = Math.sin(t / 80 + b.p);
+    g.save(); g.translate(b.x, b.y); g.scale(b.sc * (b.vx < 0 ? -1 : 1), b.sc);
+    g.globalAlpha = .9; g.fillStyle = '#8a82a6';
+    g.beginPath(); g.ellipse(0, 0, 3, 5, 0, 0, 6.2832); g.fill();
+    for (var sd = -1; sd <= 1; sd += 2) {
+      g.save(); g.scale(sd, 1); g.beginPath(); g.moveTo(2, -2);
+      g.quadraticCurveTo(11, -9 - flap * 6, 19, -3 + flap * 5); g.quadraticCurveTo(15, -1, 13, 4);
+      g.quadraticCurveTo(9, 0, 6, 3); g.quadraticCurveTo(4, 1, 2, 3); g.closePath(); g.fill(); g.restore();
+    }
+    g.beginPath(); g.moveTo(-2, -4); g.lineTo(-1, -8); g.lineTo(0, -4); g.moveTo(0, -4); g.lineTo(1, -8); g.lineTo(2, -4); g.fill();
+    g.restore();
+  }
+  /* Icy, wavy layers that bend where you move the pointer. */
+  function drawIce(t) {
+    var bg = g.createLinearGradient(0, 0, 0, h); bg.addColorStop(0, '#020711'); bg.addColorStop(1, '#07203a');
+    g.globalAlpha = 1; g.fillStyle = bg; g.fillRect(0, 0, w, h);
+  }
+  function drawWaves(t) {
+    var tt = still ? 0 : t, i, k, x, pts, y, rp, d, env, wgt;
+    for (k = ripples.length - 1; k >= 0; k--) { ripples[k].age++; if (ripples[k].age > 140) ripples.splice(k, 1); }
+    for (i = 0; i < 6; i++) {
+      var base = h * (.42 + i * .1), amp = 16 + i * 7, f1 = .0045 - i * .0004, f2 = .011 - i * .0006, sp = .00042 + i * .00009;
+      pts = [];
+      for (x = 0; x <= w + 8; x += 8) {
+        y = base + Math.sin(x * f1 + tt * sp * 6 + i) * amp + Math.sin(x * f2 - tt * sp * 9 + i * 2) * amp * .45;
+        for (k = 0; k < ripples.length; k++) {
+          rp = ripples[k]; d = x - rp.x;
+          wgt = Math.exp(-Math.pow(base - rp.y, 2) / (2 * 140 * 140)) * .9 + .25;
+          env = Math.exp(-(d * d) / (2 * Math.pow(70 + rp.age * 2.2, 2)));
+          y += rp.a * wgt * env * Math.sin(d * .045 - rp.age * .28) * Math.exp(-rp.age / 55);
+        }
+        pts.push(y);
+      }
+      var grad = g.createLinearGradient(0, base - amp * 2, 0, h);
+      grad.addColorStop(0, 'rgba(' + (150 + i * 12) + ',' + (215 + i * 6) + ',255,' + (.10 + i * .05) + ')');
+      grad.addColorStop(1, 'rgba(8,30,60,0)');
+      g.globalAlpha = 1; g.fillStyle = grad; g.beginPath(); g.moveTo(0, pts[0]);
+      for (k = 1; k < pts.length; k++) g.lineTo(k * 8, pts[k]);
+      g.lineTo(w + 8, h); g.lineTo(0, h); g.closePath(); g.fill();
+      g.strokeStyle = 'rgba(220,242,255,' + (.25 + i * .07) + ')'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(0, pts[0]);
+      for (k = 1; k < pts.length; k++) g.lineTo(k * 8, pts[k]);
+      g.stroke();
+    }
+  }
   function frame(t) {
-    var o = opt();
+    var o = opt(), se = still ? '' : seasonOf(o), i;
     g.clearRect(0, 0, w, h);
+    if (o.bg === 'ice') drawIce(t);
+    if (se !== seeded) { seeded = se; seed(se); }
     if (o.stars) {
-      for (var i = 0; i < stars.length; i++) {
+      for (i = 0; i < stars.length; i++) {
         var s = stars[i];
+        if (o.bg === 'ice' && (i % 3 || s.y > h * .55)) continue;
         var tw = still ? 1 : .8 + .2 * Math.sin(t / 1000 * s.s + s.p);
         g.globalAlpha = s.a * tw; g.fillStyle = s.c;
         g.beginPath(); g.arc(s.x, s.y, s.r, 0, 6.2832); g.fill();
       }
-      if (!still) {
-        if (t > nextShine && stars.length) {   /* once in a while one star shines */
-          shines.push({ s: stars[Math.floor(Math.random() * stars.length)], life: 0, max: 50 });
-          nextShine = t + 1800 + Math.random() * 3200;
-        }
-        for (var m = shines.length - 1; m >= 0; m--) {
-          var sh = shines[m]; sh.life++;
-          if (sh.life >= sh.max) { shines.splice(m, 1); continue; }
-          var f2 = Math.sin(Math.PI * sh.life / sh.max), L = 4 + 12 * f2;
-          g.fillStyle = '#ffffff'; g.strokeStyle = '#ffffff'; g.lineCap = 'round';
-          g.globalAlpha = .22 * f2; g.beginPath(); g.arc(sh.s.x, sh.s.y, 5 + 4 * f2, 0, 6.2832); g.fill();
-          g.globalAlpha = .9 * f2; g.lineWidth = 1.1;
-          g.beginPath(); g.moveTo(sh.s.x - L, sh.s.y); g.lineTo(sh.s.x + L, sh.s.y);
-          g.moveTo(sh.s.x, sh.s.y - L); g.lineTo(sh.s.x, sh.s.y + L); g.stroke();
-          g.globalAlpha = .45 * f2; g.lineWidth = .8; var d = L * .55;
-          g.beginPath(); g.moveTo(sh.s.x - d, sh.s.y - d); g.lineTo(sh.s.x + d, sh.s.y + d);
-          g.moveTo(sh.s.x - d, sh.s.y + d); g.lineTo(sh.s.x + d, sh.s.y - d); g.stroke();
-        }
+    }
+    if (o.bg === 'ice') drawWaves(t);
+    if (se === 'snow') {
+      for (i = 0; i < flakes.length; i++) {
+        var fk = flakes[i]; fk.y += fk.vy; fk.x += Math.sin(t / 1000 * fk.s + fk.p) * .4;
+        if (fk.y > h + 4) { fk.y = -4; fk.x = Math.random() * w; }
+        g.globalAlpha = .55 + fk.r * .15; g.fillStyle = '#ffffff';
+        g.beginPath(); g.arc(fk.x, fk.y, fk.r, 0, 6.2832); g.fill();
+      }
+    } else if (se === 'bats') {
+      for (i = 0; i < bats.length; i++) {
+        var bt = bats[i]; bt.x += bt.vx; bt.y += Math.sin(t / 700 + bt.d) * .4;
+        if (bt.x > w + 40) bt.x = -40; else if (bt.x < -40) bt.x = w + 40;
+        drawBat(bt, t);
+      }
+    }
+    if (o.stars && !still) {
+      if (t > nextShine && stars.length) {   /* once in a while one star shines */
+        shines.push({ s: stars[Math.floor(Math.random() * stars.length)], life: 0, max: 50 });
+        nextShine = t + 1800 + Math.random() * 3200;
+      }
+    }
+    if (!still) {
+      for (var m = shines.length - 1; m >= 0; m--) {
+        var sh = shines[m]; sh.life++;
+        if (sh.life >= sh.max) { shines.splice(m, 1); continue; }
+        var f2 = Math.sin(Math.PI * sh.life / sh.max), L = (4 + 12 * f2) * (sh.big ? 1.7 : 1);
+        g.fillStyle = '#ffffff'; g.strokeStyle = '#ffffff'; g.lineCap = 'round';
+        g.globalAlpha = .22 * f2; g.beginPath(); g.arc(sh.s.x, sh.s.y, (5 + 4 * f2) * (sh.big ? 1.6 : 1), 0, 6.2832); g.fill();
+        g.globalAlpha = .9 * f2; g.lineWidth = 1.1;
+        g.beginPath(); g.moveTo(sh.s.x - L, sh.s.y); g.lineTo(sh.s.x + L, sh.s.y);
+        g.moveTo(sh.s.x, sh.s.y - L); g.lineTo(sh.s.x, sh.s.y + L); g.stroke();
+        g.globalAlpha = .45 * f2; g.lineWidth = .8; var dd = L * .55;
+        g.beginPath(); g.moveTo(sh.s.x - dd, sh.s.y - dd); g.lineTo(sh.s.x + dd, sh.s.y + dd);
+        g.moveTo(sh.s.x - dd, sh.s.y + dd); g.lineTo(sh.s.x + dd, sh.s.y - dd); g.stroke();
       }
     }
     if (!o.shoot) { shots.length = 0; puffs.length = 0; }
@@ -490,6 +654,29 @@ var store = {
     }
     requestAnimationFrame(frame);
   }
+  function interactive(el) {
+    return !!(el && el.closest && el.closest('button,input,select,textarea,a,label,form,.overlay,.status,.links,.cog'));
+  }
+  addEventListener('pointerdown', function (ev) {
+    if (still || !$('browse').hidden || interactive(ev.target)) return;
+    var o = opt();
+    if (o.bg === 'ice') { ripples.push({ x: ev.clientX, y: ev.clientY, a: 42, age: 0 }); if (ripples.length > 14) ripples.shift(); return; }
+    var best = null, bd = 1600, i;   /* nearest star within 40px */
+    for (i = 0; i < stars.length; i++) {
+      var dx = stars[i].x - ev.clientX, dy = stars[i].y - ev.clientY, dist = dx * dx + dy * dy;
+      if (dist < bd) { bd = dist; best = stars[i]; }
+    }
+    if (best) shines.push({ s: best, life: 0, max: 80, big: true });
+  }, { passive: true });
+  addEventListener('pointermove', function (ev) {
+    if (still || !$('browse').hidden || opt().bg !== 'ice') return;
+    var now = performance.now(); if (now - lastRipple < 45) return;
+    var dx = ev.clientX - lastX, dy = ev.clientY - lastY, sp = Math.min(Math.sqrt(dx * dx + dy * dy), 60);
+    lastX = ev.clientX; lastY = ev.clientY;
+    if (sp < 3) return;
+    lastRipple = now; ripples.push({ x: ev.clientX, y: ev.clientY, a: 6 + sp * .45, age: 0 });
+    if (ripples.length > 14) ripples.shift();
+  }, { passive: true });
   addEventListener('resize', size);
   size(); requestAnimationFrame(frame);
 })();
@@ -630,37 +817,56 @@ var STATUS_NOTICE = '';
 /* ===================== settings ===================== */
 (function () {
   var ov = $('settings');
-  var ENGINES = { ddg: 'https://duckduckgo.com/?q=', google: 'https://www.google.com/search?q=', bing: 'https://www.bing.com/search?q=' };
+  var ENGINES = { ddg: 'https://duckduckgo.com/?q=', google: 'https://www.google.com/search?q=', bing: 'https://www.bing.com/search?q=',
+                  brave: 'https://search.brave.com/search?q=', startpage: 'https://www.startpage.com/sp/search?query=' };
   var ICONS = {
     "default": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2305070f'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%235aa2ff'/%3E%3C/svg%3E",
     doc: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M8 3h11l6 6v20H8z' fill='%23dfe5f0'/%3E%3Cpath d='M19 3v6h6z' fill='%23aab4c9'/%3E%3C/svg%3E",
     globe: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='%235aa2ff' stroke-width='2.5'/%3E%3Cpath d='M4 16h24M16 4c-6 7-6 17 0 24M16 4c6 7 6 17 0 24' fill='none' stroke='%235aa2ff' stroke-width='2'/%3E%3C/svg%3E",
     blank: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E"
   };
-  var cfg = { engine: store.get('tsw.engine', 'ddg'), stars: store.get('tsw.stars', true), shoot: store.get('tsw.shoot', true),
-              title: store.get('tsw.title', ''), icon: store.get('tsw.icon', 'default') };
+  var D = { engine: 'ddg', stars: true, shoot: true, title: '', icon: 'default', bg: 'stars', season: 'auto' };
+  var cfg = {};
+  Object.keys(D).forEach(function (k) { cfg[k] = store.get('tsw.' + k, D[k]); });
   if (!ENGINES[cfg.engine]) cfg.engine = 'ddg';
   if (!ICONS[cfg.icon]) cfg.icon = 'default';
+  if (cfg.bg !== 'ice') cfg.bg = 'stars';
+  if (['auto', 'snow', 'bats', 'off'].indexOf(cfg.season) < 0) cfg.season = 'auto';
+
   function apply() {
-    window.TSWSky = { stars: !!cfg.stars, shoot: !!cfg.shoot };
+    window.TSWSky = { stars: !!cfg.stars, shoot: !!cfg.shoot, bg: cfg.bg, season: cfg.season };
     window.TSWSearch = function () { return ENGINES[cfg.engine]; };
     document.title = cfg.title || 'TSW v2';
     $('fav').href = ICONS[cfg.icon];
   }
+  function put(k, v) { cfg[k] = v; store.set('tsw.' + k, v); apply(); }
   function fill() {
-    $('set-engine').value = cfg.engine; $('set-stars').checked = !!cfg.stars; $('set-shoot').checked = !!cfg.shoot;
+    $('set-engine').value = cfg.engine; $('set-bg').value = cfg.bg; $('set-season').value = cfg.season;
+    $('set-stars').checked = !!cfg.stars; $('set-shoot').checked = !!cfg.shoot;
     $('set-title').value = cfg.title; $('set-icon').value = cfg.icon;
   }
-  $('set-engine').addEventListener('change', function () { cfg.engine = this.value; store.set('tsw.engine', cfg.engine); apply(); });
-  $('set-stars').addEventListener('change', function () { cfg.stars = this.checked; store.set('tsw.stars', cfg.stars); apply(); });
-  $('set-shoot').addEventListener('change', function () { cfg.shoot = this.checked; store.set('tsw.shoot', cfg.shoot); apply(); });
-  $('set-title').addEventListener('input', function () { cfg.title = this.value.trim(); store.set('tsw.title', cfg.title); apply(); });
-  $('set-icon').addEventListener('change', function () { cfg.icon = this.value; store.set('tsw.icon', cfg.icon); apply(); });
+  $('set-engine').addEventListener('change', function () { put('engine', this.value); });
+  $('set-bg').addEventListener('change', function () { put('bg', this.value); });
+  $('set-season').addEventListener('change', function () { put('season', this.value); });
+  $('set-stars').addEventListener('change', function () { put('stars', this.checked); });
+  $('set-shoot').addEventListener('change', function () { put('shoot', this.checked); });
+  $('set-title').addEventListener('input', function () { put('title', this.value.trim()); });
+  $('set-icon').addEventListener('change', function () { put('icon', this.value); });
   $('set-reset').addEventListener('click', function () {
-    ['tsw.engine', 'tsw.stars', 'tsw.shoot', 'tsw.title', 'tsw.icon'].forEach(store.del);
-    cfg = { engine: 'ddg', stars: true, shoot: true, title: '', icon: 'default' }; fill(); apply();
+    Object.keys(D).forEach(function (k) { store.del('tsw.' + k); cfg[k] = D[k]; });
+    fill(); apply();
   });
   $('cog').addEventListener('click', function () { fill(); ov.hidden = false; $('set-engine').focus(); });
+
+  /* install as an app (only offered by browsers that support it) */
+  var deferred = null;
+  addEventListener('beforeinstallprompt', function (ev) { ev.preventDefault(); deferred = ev; $('install-btn').hidden = false; });
+  addEventListener('appinstalled', function () { deferred = null; $('install-btn').hidden = true; });
+  $('install-btn').addEventListener('click', function () {
+    if (!deferred) return;
+    deferred.prompt();
+    deferred.userChoice.then(function () { deferred = null; $('install-btn').hidden = true; }, function () {});
+  });
   apply();
 })();
 
@@ -751,12 +957,51 @@ document.addEventListener('keydown', function (ev) {
     if (/^localhost(:\d+)?(\/|$)/i.test(text)) return 'http://' + text;
     return (window.TSWSearch ? window.TSWSearch() : SEARCH) + encodeURIComponent(text);
   }
+  var spinTimer, slowTimer, diag = document.getElementById('diag');
+  var FORM = 'https://docs.google.com/forms/d/e/1FAIpQLScupiUZuqQsngFai_QPQRWn06LpuZy3VGZOEyIUY0DAZ0qJxw/viewform';
   function loading(on) {
     load.classList.remove('on'); void load.offsetWidth;
     if (on) load.classList.add('on');
+    bRel.classList.toggle('spinning', !!on);
+    clearTimeout(spinTimer);
+    if (on) spinTimer = setTimeout(function () { bRel.classList.remove('spinning'); }, 20000);
+  }
+  /* ---- friendly "why didn't it load" messages ---- */
+  var MSG = {
+    blocked: ['This site is probably blocking proxies', 'Sites with bot checks, logins, or video streaming often refuse traffic that comes from a server. Nothing is wrong with TSW v2. Try another site, or search for what you need instead.'],
+    unreachable: ['TSW v2 couldn\u2019t reach this site', 'The address may have a typo, the site may be down, or it may refuse connections from this server. Check the address and try again.'],
+    secure: ['A secure connection problem', 'The site\u2019s security check didn\u2019t go through the proxy. Reloading sometimes helps, but some sites will not work here.'],
+    server: ['TSW v2\u2019s server is having trouble', 'The proxy server looks down or is waking up. Wait a minute, then reload.'],
+    slow: ['This is taking a while', 'Heavy sites can load slowly on the free server. You can keep waiting, reload, or try another site.'],
+    error: ['Something went wrong loading this site', 'The proxy returned an error page. Reload once, and if it keeps happening, this is likely a site TSW v2 can\u2019t handle.'],
+    popup: ['Your browser blocked the new tab', 'Allow pop-ups for this site, or copy the address and paste it into a new tab.']
+  };
+  function hideDiag() { diag.hidden = true; }
+  function showDiag(kind, soft) {
+    var m = MSG[kind]; if (!m) return;
+    document.getElementById('diag-t').textContent = m[0]; document.getElementById('diag-p').textContent = m[1];
+    diag.classList.toggle('soft', !!soft); diag.hidden = false;
+  }
+  /* Looks at the page inside the frame. These are guesses from the page text, so the messages say "probably". */
+  function diagnose() {
+    if (document.getElementById('status').getAttribute('data-s') === 'down') return 'server';
+    var fr = view.querySelector('iframe'), txt = '', title = '';
+    try { var d = fr.contentDocument; txt = ((d.body && d.body.innerText) || '').slice(0, 3000); title = d.title || ''; } catch (e) { return null; }
+    if (txt.length > 2500) return null;   /* real pages are long; error pages are short */
+    var low = (title + ' ' + txt).toLowerCase();
+    if (/captcha|verify you are human|are you a robot|just a moment|access denied|forbidden|too many requests|unusual traffic|\b403\b|\b429\b/.test(low)) return 'blocked';
+    if (/err_name_not_resolved|name not resolved|enotfound|could not resolve|connection refused|econnrefused|timed out|etimedout|unreachable|failed to fetch|network error/.test(low)) return 'unreachable';
+    if (/certificate|\bssl\b|\btls\b|handshake/.test(low)) return 'secure';
+    if (txt.length < 800 && /error|failed|went wrong|couldn.t|cannot|can.t/.test(low)) return 'error';
+    return null;
+  }
+  function openTab() {
+    var u = current || addr.value; if (!u) return;
+    var w = window.open(location.origin + '/?go=' + encodeURIComponent(u), '_blank');
+    if (!w) showDiag('popup', true);
   }
   function fail(title, body) {
-    loading(false);
+    loading(false); clearTimeout(slowTimer);
     view.innerHTML = '';
     var box = document.createElement('div'); box.className = 'fail';
     var inner = document.createElement('div');
@@ -769,6 +1014,7 @@ document.addEventListener('keydown', function (ev) {
   function setNav() {
     var e = window.TSWEngine;
     bBack.disabled = !(e && e.back); bFwd.disabled = !(e && e.forward); bRel.disabled = !(e && e.reload);
+    document.getElementById('btn-newtab').disabled = !e;
   }
   function open(text) {
     var url = toUrl(text);
@@ -776,11 +1022,16 @@ document.addEventListener('keydown', function (ev) {
     try { new URL(url); } catch (_) { homeMsg.textContent = 'That doesn\u2019t look like a valid address.'; return; }
     current = url; addr.value = url;
     home.hidden = true; browse.hidden = false; setNav(); loading(true);
+    hideDiag(); clearTimeout(slowTimer); slowTimer = setTimeout(function () { showDiag('slow', true); }, 30000);
     var e = window.TSWEngine;
     if (!e) { fail('The proxy engine isn\u2019t connected yet', 'This page is the TSW v2 interface only. The Scramjet engine is added in the next build stage.'); return; }
     Promise.resolve(e.ready).then(function () {
       engine = e.open(url, view);
-      if (e.onload) e.onload(function (u) { loading(false); if (u) { current = u; addr.value = u; } });
+      if (e.onload) e.onload(function (u) {
+        loading(false); clearTimeout(slowTimer);
+        if (u) { current = u; addr.value = u; }
+        setTimeout(function () { var k = diagnose(); if (k) showDiag(k); else hideDiag(); }, 500);
+      });
       else setTimeout(function () { loading(false); }, 1500);
     }).catch(function (err) {
       fail('Couldn\u2019t start the proxy', (err && err.message ? err.message + ' ' : '') +
@@ -788,7 +1039,7 @@ document.addEventListener('keydown', function (ev) {
     });
   }
   function goHome() {
-    browse.hidden = true; home.hidden = false; view.innerHTML = ''; loading(false);
+    browse.hidden = true; home.hidden = false; view.innerHTML = ''; loading(false); hideDiag(); clearTimeout(slowTimer);
     homeInput.value = ''; homeMsg.textContent = ''; if (online()) homeInput.focus();
   }
 
@@ -820,9 +1071,23 @@ document.addEventListener('keydown', function (ev) {
   addr.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') open(addr.value); });
   addr.addEventListener('focus', function () { addr.select(); });
   document.getElementById('btn-home').onclick = goHome;
-  bBack.onclick = function () { var e = window.TSWEngine; if (e && e.back) { loading(true); e.back(); } };
+  bBack.onclick = function () { var e = window.TSWEngine; if (e && e.back) { hideDiag(); loading(true); e.back(); } };
   bFwd.onclick = function () { var e = window.TSWEngine; if (e && e.forward) { loading(true); e.forward(); } };
-  bRel.onclick = function () { var e = window.TSWEngine; if (e && e.reload) { loading(true); e.reload(); } };
+  bRel.onclick = function () { var e = window.TSWEngine; if (e && e.reload) { hideDiag(); loading(true); e.reload(); } };
+  document.getElementById('btn-newtab').onclick = openTab;
+  document.getElementById('diag-x').onclick = hideDiag;
+  document.getElementById('diag-reload').onclick = function () { var e = window.TSWEngine; hideDiag(); if (e && e.reload) { loading(true); e.reload(); } };
+  document.getElementById('diag-tab').onclick = openTab;
+  document.getElementById('diag-report').addEventListener('click', function () {
+    try { if (navigator.clipboard && current) navigator.clipboard.writeText(current); } catch (e) {}
+    document.getElementById('diag-p').textContent = 'The site address was copied if your browser allowed it. Paste it into the form.';
+  });
+  /* "Open in new tab" links look like /?go=<address> */
+  var goParam = new URLSearchParams(location.search).get('go');
+  if (goParam) {
+    try { history.replaceState(null, '', location.pathname); } catch (e) {}
+    if (online()) open(goParam); else down();
+  }
 })();
 </script>
 </body>
