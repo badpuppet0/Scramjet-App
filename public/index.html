@@ -175,77 +175,36 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
 @media (max-width: 520px) { #btn-fwd, #btn-reload { display: none; } }
 @media (prefers-reduced-motion: reduce) { .shake, .status .dot, .spin { animation: none; } .load.on { animation-duration: 0s; width: 92%; } }
 
-/* ---- v1.2 look ---- */
-.hero { width: min(40rem, 100%); }
-.mark { font-size: clamp(3.8rem, 16vw, 8rem); text-shadow: 0 0 60px rgba(90,162,255,.35); line-height: 1.05; }
-.tag { font-size: 1.05rem; margin: .6rem 0 2rem; }
+/* ---- v1.2 additions ---- */
 .cog { width: 3rem; height: 3rem; }
 .cog svg { width: 1.5rem; height: 1.5rem; }
 .cog.log { right: 4.4rem; }
-.status { font-size: .88rem; }
-.status svg { width: 1.25rem; height: 1.25rem; }
-.panel { width: min(34rem, 100%); }
-
-.field { display: block; padding: 0; border-radius: 16px; overflow: hidden; text-align: left;
-  background: rgba(9,12,22,.88); border: 1px solid #243049;
-  box-shadow: 0 0 0 1px rgba(90,162,255,.08), 0 18px 60px rgba(30,80,200,.18); }
-.field:focus-within { border-color: #3b6cb4; box-shadow: 0 0 0 1px rgba(90,162,255,.35), 0 18px 70px rgba(40,100,255,.3); }
-.boxbar { display: flex; align-items: center; gap: .4rem; padding: .5rem .85rem; border-bottom: 1px solid var(--edge);
-  background: rgba(255,255,255,.025); color: #566079; font-size: .75rem; letter-spacing: .08em; }
-.boxbar i { width: .55rem; height: .55rem; border-radius: 50%; background: #2a3246; }
-.boxbar i:first-child { background: var(--blue); }
-.boxbar span { margin-left: .5rem; }
-.boxrow { display: flex; align-items: center; gap: .7rem; padding: .7rem .7rem .7rem 1rem; }
-.boxrow > svg { width: 1.3rem; height: 1.3rem; color: var(--steel); flex: none; }
-.field input { font-size: 1.1rem; }
-.field .go { width: 2.8rem; height: 2.8rem; border-radius: 12px; }
-
-.f input[type=password] { width: 100%; background: var(--void); border: 1px solid var(--edge); color: var(--ink);
-  border-radius: 10px; padding: .55rem .7rem; font: inherit; outline: 0; }
-.row input[type=password] { flex: 1; }
-.ic { width: 1.5rem; height: 1.5rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
-.sec { margin-top: 1.5rem; }
-.sec:first-child { margin-top: 0; }
-.sec h4 { display: flex; align-items: center; gap: .6rem; font-size: 1rem; font-weight: 600; margin-bottom: .3rem; }
-.sec h4 .ic { color: var(--blue); width: 1.6rem; height: 1.6rem; }
-.soonrow { display: flex; align-items: center; gap: .85rem; padding: .7rem .8rem; margin-top: .5rem;
+.cog.games { right: 7.9rem; }
+.status { cursor: pointer; }
+.status:hover, .status:focus-visible { border-color: var(--blue-dim); outline: 0; }
+.subh { margin-top: 1.4rem; font-size: .95rem; font-weight: 600; }
+.soonrow { display: flex; align-items: center; gap: .85rem; padding: .7rem .8rem; margin-top: .6rem;
   border: 1px solid var(--edge); border-radius: 12px; background: rgba(255,255,255,.015); }
-.soonrow .ic { width: 1.7rem; height: 1.7rem; color: var(--steel); }
+.soonrow > svg { width: 1.6rem; height: 1.6rem; color: var(--steel); flex: none; fill: none; stroke: currentColor;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .soonrow b { display: block; font-weight: 500; font-size: .92rem; }
 .soonrow small { color: var(--steel); font-size: .78rem; }
 .badge { margin-left: auto; flex: none; font-size: .7rem; color: #9ac4ff; border: 1px solid var(--blue-dim);
   border-radius: 999px; padding: .12rem .55rem; white-space: nowrap; }
-.rng { display: flex; align-items: center; gap: .8rem; }
-.rng input { flex: 1; accent-color: var(--blue); }
-.rng output { min-width: 3.2rem; text-align: right; color: var(--steel); font-size: .85rem; }
-.modbtns { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1rem; }
-.modbtns .plain { margin-top: 0; }
+.pbody .kv { margin: 0; }
+.pbody .kv div { display: flex; justify-content: space-between; gap: 1rem; padding: .65rem 0; border-bottom: 1px solid var(--edge); }
+.pbody .kv dt { color: var(--steel); font-size: .9rem; margin: 0; font-weight: 400; }
+.pbody .kv dd { margin: 0; color: var(--ink); text-align: right; word-break: break-all; font-variant-numeric: tabular-nums; }
 </style>
 </head>
 <body>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-<symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></symbol>
-<symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></symbol>
-<symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
-<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></symbol>
-<symbol id="i-shieldcheck" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></symbol>
-<symbol id="i-tabs" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 11h18M8 7V4h6v3"/></symbol>
-<symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></symbol>
-<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
-<symbol id="i-palette" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="8.5" cy="10" r="1"/><circle cx="12" cy="7.5" r="1"/><circle cx="15.5" cy="10" r="1"/></symbol>
-<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></symbol>
-<symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c-3 3.5-3 14 0 18M12 3c3 3.5 3 14 0 18"/></symbol>
-<symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3L5 14h6l-1 7 8-11h-6z"/></symbol>
-<symbol id="i-sync" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-14-5.3L4 9M4 4v5h5M4 12a8 8 0 0 0 14 5.3L20 15M20 20v-5h-5"/></symbol>
-<symbol id="i-switch" viewBox="0 0 24 24"><path d="M7 7h11l-3-3M17 17H6l3 3"/></symbol>
-<symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></symbol>
-</defs></svg>
 <canvas id="sky" aria-hidden="true"></canvas>
 <button class="cog" id="cog" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
 <button class="cog log" id="logbtn" aria-label="Change log" title="Change log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h7"/></svg></button>
+<button class="cog games" id="gamesbtn" aria-label="Games" title="Games"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 10v5M4.5 12.5h5"/><circle cx="16" cy="11.5" r=".7"/><circle cx="18.5" cy="13.5" r=".7"/></svg></button>
 <div class="toast" id="toast" role="status" hidden></div>
 
-<div class="status" id="status" data-s="check" role="status" aria-live="polite">
+<div class="status" id="status" data-s="check" role="button" tabindex="0" title="Server info" aria-label="Server status. Open server info">
   <span class="dot"></span>
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="6" rx="1.5"/><rect x="3" y="14" width="18" height="6" rx="1.5"/><path d="M7 7h.01M7 17h.01"/></svg>
   <span id="status-text">Checking server…</span>
@@ -255,65 +214,50 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="set-h">
     <div class="phead"><h2 id="set-h">Settings</h2><button data-close aria-label="Close">&times;</button></div>
     <div class="pbody f">
-      <section class="sec">
-        <h4><svg class="ic"><use href="#i-sliders"/></svg>General</h4>
-        <label for="set-engine">Search engine</label>
-        <select id="set-engine"><option value="ddg">DuckDuckGo</option><option value="google">Google</option><option value="bing">Bing</option></select>
-        <p class="hint">Google may ask you to prove you are not a robot.</p>
-        <label for="set-title">Tab title</label>
-        <input id="set-title" type="text" maxlength="40" placeholder="TSW v2" autocomplete="off">
-        <label for="set-icon">Tab icon</label>
-        <select id="set-icon"><option value="default">TSW v2</option><option value="doc">Document</option><option value="globe">Globe</option><option value="blank">Blank</option></select>
-        <p class="hint">The tab title and icon only change the TSW v2 tab.</p>
-      </section>
-      <section class="sec">
-        <h4><svg class="ic"><use href="#i-star"/></svg>Visuals</h4>
-        <label class="check"><input type="checkbox" id="set-stars"> Stars</label>
-        <label class="check"><input type="checkbox" id="set-shoot"> Shooting stars and rockets</label>
-      </section>
-      <section class="sec">
-        <h4><svg class="ic"><use href="#i-lock"/></svg>Privacy</h4>
-        <div class="soonrow"><svg class="ic"><use href="#i-shield"/></svg><div><b>Tor browser</b><small>Route your browsing through the Tor network.</small></div><span class="badge">Coming soon</span></div>
-      </section>
-      <section class="sec">
-        <h4><svg class="ic"><use href="#i-bolt"/></svg>Coming soon</h4>
-        <div class="soonrow"><svg class="ic"><use href="#i-palette"/></svg><div><b>Themes</b><small>Pick a color theme for TSW v2.</small></div><span class="badge">Coming soon</span></div>
-        <div class="soonrow"><svg class="ic"><use href="#i-tabs"/></svg><div><b>Tabs</b><small>Keep several sites open at once.</small></div><span class="badge">Coming soon</span></div>
-        <div class="soonrow"><svg class="ic"><use href="#i-bookmark"/></svg><div><b>Bookmarks</b><small>Save your favorite pages.</small></div><span class="badge">Coming soon</span></div>
-        <div class="soonrow"><svg class="ic"><use href="#i-clock"/></svg><div><b>History</b><small>See the sites you visited.</small></div><span class="badge">Coming soon</span></div>
-        <div class="soonrow"><svg class="ic"><use href="#i-shieldcheck"/></svg><div><b>Ad blocker</b><small>Hide ads on the sites you visit.</small></div><span class="badge">Coming soon</span></div>
-        <div class="soonrow"><svg class="ic"><use href="#i-download"/></svg><div><b>Downloads</b><small>Save files from sites.</small></div><span class="badge">Coming soon</span></div>
-        <div class="soonrow"><svg class="ic"><use href="#i-globe"/></svg><div><b>Language</b><small>Change the language of TSW v2.</small></div><span class="badge">Coming soon</span></div>
-        <div class="soonrow"><svg class="ic"><use href="#i-bolt"/></svg><div><b>Performance mode</b><small>Lighter visuals for slow devices.</small></div><span class="badge">Coming soon</span></div>
-        <div class="soonrow"><svg class="ic"><use href="#i-sync"/></svg><div><b>Backup and sync</b><small>Move your settings between devices.</small></div><span class="badge">Coming soon</span></div>
-        <div class="soonrow"><svg class="ic"><use href="#i-switch"/></svg><div><b>Proxy engine picker</b><small>Switch engines when a site fails.</small></div><span class="badge">Coming soon</span></div>
-      </section>
-      <section class="sec">
-        <h4><svg class="ic"><use href="#i-wrench"/></svg>Mod menu</h4>
-        <div id="mod-lock">
-          <p class="hint">Enter the mod code to unlock extra controls.</p>
-          <div class="row"><input id="mod-code" type="password" inputmode="numeric" maxlength="8" placeholder="Code" autocomplete="off" aria-label="Mod code"><button class="primary" type="button" id="mod-go">Unlock</button></div>
-          <p class="err" id="mod-err" role="alert"></p>
-        </div>
-        <div id="mod-menu" hidden>
-          <label for="mod-density">Star amount</label>
-          <div class="rng"><input type="range" id="mod-density" min="0.3" max="2" step="0.1"><output id="out-density"></output></div>
-          <label for="mod-freq">Shooting star rate</label>
-          <div class="rng"><input type="range" id="mod-freq" min="0.5" max="4" step="0.5"><output id="out-freq"></output></div>
-          <label for="mod-rocket">Rocket chance</label>
-          <div class="rng"><input type="range" id="mod-rocket" min="0" max="100" step="5"><output id="out-rocket"></output></div>
-          <label for="mod-glow">Star glow</label>
-          <div class="rng"><input type="range" id="mod-glow" min="0" max="2" step="0.25"><output id="out-glow"></output></div>
-          <label class="check"><input type="checkbox" id="mod-hidestatus"> Hide the server status pill</label>
-          <div class="modbtns">
-            <button type="button" class="plain" id="mod-rocketnow">Launch a rocket</button>
-            <button type="button" class="plain" id="mod-storm">Shooting star storm</button>
-            <button type="button" class="plain" id="mod-lockbtn">Lock mod menu</button>
-          </div>
-        </div>
-      </section>
-      <p class="hint" style="margin-top:1.4rem">Settings are saved in this browser.</p>
+      <label for="set-engine">Search engine</label>
+      <select id="set-engine"><option value="ddg">DuckDuckGo</option><option value="google">Google</option><option value="bing">Bing</option></select>
+      <p class="hint">Google may ask you to prove you are not a robot.</p>
+      <label class="check"><input type="checkbox" id="set-stars"> Stars</label>
+      <label class="check"><input type="checkbox" id="set-shoot"> Shooting stars and rockets</label>
+      <label for="set-title">Tab title</label>
+      <input id="set-title" type="text" maxlength="40" placeholder="TSW v2" autocomplete="off">
+      <label for="set-icon">Tab icon</label>
+      <select id="set-icon"><option value="default">TSW v2</option><option value="doc">Document</option><option value="globe">Globe</option><option value="blank">Blank</option></select>
+      <p class="hint">The tab title and icon only change the TSW v2 tab.</p>
+      <h4 class="subh">Browser options</h4>
+      <div class="soonrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg><div><b>Tor browser</b><small>Route your browsing through the Tor network.</small></div><span class="badge">Coming soon</span></div>
+      <p class="hint" style="margin-top:1.2rem">Settings are saved in this browser.</p>
       <button type="button" class="plain" id="set-reset">Reset to defaults</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="games" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="gm-h">
+    <div class="phead"><h2 id="gm-h">Games</h2><button data-close aria-label="Close">&times;</button></div>
+    <div class="pbody">
+      <p class="hint" style="font-size:.95rem;margin:0 0 .4rem">Games are coming soon.</p>
+      <div class="soonrow"><div><b>Arcade</b><small>Quick classic games.</small></div><span class="badge">Coming soon</span></div>
+      <div class="soonrow"><div><b>Puzzle</b><small>Brain teasers and word games.</small></div><span class="badge">Coming soon</span></div>
+      <div class="soonrow"><div><b>Racing</b><small>Fast and simple racers.</small></div><span class="badge">Coming soon</span></div>
+      <div class="soonrow"><div><b>Multiplayer</b><small>Play with friends.</small></div><span class="badge">Coming soon</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="info" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="info-h">
+    <div class="phead"><h2 id="info-h">Server info</h2><button data-close aria-label="Close">&times;</button></div>
+    <div class="pbody">
+      <dl class="kv">
+        <div><dt>Status</dt><dd id="i-status">-</dd></div>
+        <div><dt>Server response time</dt><dd id="i-rtt">-</dd></div>
+        <div><dt>Proxy ping</dt><dd id="i-ping">-</dd></div>
+        <div><dt>Server IP address</dt><dd id="i-ip">-</dd></div>
+        <div><dt>Server uptime</dt><dd id="i-up">-</dd></div>
+      </dl>
+      <p class="hint" style="margin-top:.9rem">Response time is the round trip to the server. Proxy ping is the time to open the proxy's WebSocket connection, so it includes connection setup and reads higher than a plain ping. The IP address is the server's outside address, which is what websites see.</p>
+      <div class="row"><button class="primary" type="button" id="i-refresh">Refresh</button></div>
     </div>
   </div>
 </div>
@@ -346,13 +290,14 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
     <div class="phead"><h2 id="log-title">Change log</h2><button id="log-close" aria-label="Close">&times;</button></div>
     <div class="tabs"><button class="on" data-tab="updates">Updates</button><button data-tab="credits">Credits</button></div>
     <div class="pbody" id="tab-updates">
-      <h3>TSW v2 1.2<span>A bigger look</span></h3>
+      <h3>TSW v2 1.2<span>Rockets and server info</span></h3>
       <p class="date">October 2026</p>
       <ul>
-        <li>Bigger TSW v2 title and a boxed search window.</li>
-        <li>Brighter, more colorful stars, plus tiny rockets that fly across the sky.</li>
-        <li>Larger icons and a reorganized settings panel, with a locked mod menu.</li>
-        <li>A list of features coming soon.</li>
+        <li>Tiny rockets now fly across the sky between the shooting stars, and stars sometimes shine.</li>
+        <li>New Games tab in the top right. It is coming soon.</li>
+        <li>Click the server status to see response time, proxy ping, and the server IP address.</li>
+        <li>Browser options in Settings, starting with Tor browser (coming soon).</li>
+        <li>Slightly bigger buttons in the top right.</li>
       </ul>
       <h3 class="older">TSW v2 1.1<span>Settings and shortcuts</span></h3>
       <p class="date">October 2026</p>
@@ -388,15 +333,11 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
     <h1 class="mark">TSW<b>v2</b></h1>
     <p class="tag">Type a website or a search.</p>
     <form class="field" id="home-form" autocomplete="off">
-      <div class="boxbar"><i></i><i></i><i></i><span>tsw://browse</span></div>
-      <div class="boxrow">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
       <input id="home-input" type="text" inputmode="url" autocapitalize="off" spellcheck="false"
              placeholder="Search or enter a web address" aria-label="Search or enter a web address">
       <button class="go" type="submit" aria-label="Open">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </button>
-      </div>
     </form>
     <nav class="links" id="links" aria-label="Shortcuts">
       <button type="button" data-url="https://www.tiktok.com">TikTok</button>
@@ -436,34 +377,28 @@ var store = {
 /* ===================== stars + shooting stars + rockets ===================== */
 (function () {
   var c = $('sky'), g = c.getContext('2d');
-  var stars = [], shots = [], puffs = [], w = 0, h = 0, dpr = 1, next = 0;
+  var stars = [], shots = [], puffs = [], shines = [], w = 0, h = 0, dpr = 1, next = 0, nextShine = 1500;
   var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var COLORS = ['#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff', '#bfe0ff', '#8fd0ff', '#ffd9a8', '#ffb3e6', '#b9a6ff'];
+  var COLORS = ['#ffffff', '#ffffff', '#ffffff', '#ffffff', '#eef4ff'];
 
-  function opt() {
-    var o = window.TSWSky || {};
-    return { stars: o.stars !== false, shoot: o.shoot !== false, density: o.density || 1, freq: o.freq || 1,
-             rocket: o.rocket == null ? 0.2 : o.rocket, glow: o.glow == null ? 1 : o.glow };
-  }
+  function opt() { var o = window.TSWSky || {}; return { stars: o.stars !== false, shoot: o.shoot !== false }; }
   function size() {
     dpr = Math.min(window.devicePixelRatio || 1, 2);
     w = innerWidth; h = innerHeight;
     c.width = w * dpr; c.height = h * dpr;
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
-    var n = Math.round(w * h / 4200 * opt().density);
+    var n = Math.round(w * h / 5200);
     stars = [];
     for (var i = 0; i < n; i++) {
-      var big = Math.random() < .14;
-      stars.push({ x: Math.random() * w, y: Math.random() * h, big: big,
-        r: big ? 1.5 + Math.random() * .7 : .5 + Math.random() * .9,
-        a: .75 + Math.random() * .25, s: Math.random() * 2.2 + .7, p: Math.random() * 6.28,
+      stars.push({ x: Math.random() * w, y: Math.random() * h,
+        r: Math.random() < .12 ? 1.6 : Math.random() * .9 + .5,
+        a: Math.random() * .35 + .65, s: Math.random() * 2 + .6, p: Math.random() * 6.28,
         c: COLORS[Math.floor(Math.random() * COLORS.length)] });
     }
   }
-  function spawn(kind) {
-    var rocket = kind ? kind === 'rocket' : Math.random() < opt().rocket;
+  function spawn() {
     var fromLeft = Math.random() < .5;
-    if (rocket) {
+    if (Math.random() < .2) {   /* 1 in 5 is a tiny rocket */
       var rvx = (fromLeft ? 1 : -1) * (2.4 + Math.random() * 1.2);
       shots.push({ rocket: true, x: fromLeft ? -30 : w + 30, y: h * .12 + Math.random() * h * .55,
         vx: rvx, vy: Math.random() * 1.8 - .7, life: 0, max: (w + 120) / Math.abs(rvx) + 20 });
@@ -501,23 +436,37 @@ var store = {
     if (o.stars) {
       for (var i = 0; i < stars.length; i++) {
         var s = stars[i];
-        var tw = still ? 1 : .75 + .25 * Math.sin(t / 1000 * s.s + s.p);
-        g.fillStyle = s.c;
-        if ((s.big || s.c !== '#ffffff') && o.glow > 0) {
-          g.globalAlpha = s.a * tw * .14 * o.glow; g.beginPath(); g.arc(s.x, s.y, s.r * 5, 0, 6.2832); g.fill();
-          g.globalAlpha = s.a * tw * .3 * o.glow; g.beginPath(); g.arc(s.x, s.y, s.r * 2.3, 0, 6.2832); g.fill();
+        var tw = still ? 1 : .8 + .2 * Math.sin(t / 1000 * s.s + s.p);
+        g.globalAlpha = s.a * tw; g.fillStyle = s.c;
+        g.beginPath(); g.arc(s.x, s.y, s.r, 0, 6.2832); g.fill();
+      }
+      if (!still) {
+        if (t > nextShine && stars.length) {   /* once in a while one star shines */
+          shines.push({ s: stars[Math.floor(Math.random() * stars.length)], life: 0, max: 50 });
+          nextShine = t + 1800 + Math.random() * 3200;
         }
-        g.globalAlpha = s.a * tw; g.beginPath(); g.arc(s.x, s.y, s.r, 0, 6.2832); g.fill();
+        for (var m = shines.length - 1; m >= 0; m--) {
+          var sh = shines[m]; sh.life++;
+          if (sh.life >= sh.max) { shines.splice(m, 1); continue; }
+          var f2 = Math.sin(Math.PI * sh.life / sh.max), L = 4 + 12 * f2;
+          g.fillStyle = '#ffffff'; g.strokeStyle = '#ffffff'; g.lineCap = 'round';
+          g.globalAlpha = .22 * f2; g.beginPath(); g.arc(sh.s.x, sh.s.y, 5 + 4 * f2, 0, 6.2832); g.fill();
+          g.globalAlpha = .9 * f2; g.lineWidth = 1.1;
+          g.beginPath(); g.moveTo(sh.s.x - L, sh.s.y); g.lineTo(sh.s.x + L, sh.s.y);
+          g.moveTo(sh.s.x, sh.s.y - L); g.lineTo(sh.s.x, sh.s.y + L); g.stroke();
+          g.globalAlpha = .45 * f2; g.lineWidth = .8; var d = L * .55;
+          g.beginPath(); g.moveTo(sh.s.x - d, sh.s.y - d); g.lineTo(sh.s.x + d, sh.s.y + d);
+          g.moveTo(sh.s.x - d, sh.s.y + d); g.lineTo(sh.s.x + d, sh.s.y - d); g.stroke();
+        }
       }
     }
     if (!o.shoot) { shots.length = 0; puffs.length = 0; }
     else if (!still) {
-      if (t > next) { spawn(); if (Math.random() < .3) spawn(); next = t + (1400 + Math.random() * 2600) / o.freq; }
+      if (t > next) { spawn(); if (Math.random() < .3) spawn(); next = t + 1400 + Math.random() * 2600; }
       for (var k = puffs.length - 1; k >= 0; k--) {
         var pf = puffs[k]; pf.life++;
         if (pf.life >= pf.max) { puffs.splice(k, 1); continue; }
-        var pa = 1 - pf.life / pf.max;
-        g.globalAlpha = .45 * pa; g.fillStyle = 'rgb(255,190,130)';
+        g.globalAlpha = .45 * (1 - pf.life / pf.max); g.fillStyle = 'rgb(255,190,130)';
         g.beginPath(); g.arc(pf.x, pf.y, pf.r + pf.life * .12, 0, 6.2832); g.fill();
       }
       for (var j = shots.length - 1; j >= 0; j--) {
@@ -541,8 +490,6 @@ var store = {
     }
     requestAnimationFrame(frame);
   }
-  window.TSWSkyRefresh = size;
-  window.TSWSkySpawn = function (kind, n) { if (still) return; for (var i = 0; i < (n || 1); i++) spawn(kind); };
   addEventListener('resize', size);
   size(); requestAnimationFrame(frame);
 })();
@@ -613,6 +560,55 @@ var STATUS_NOTICE = '';
   ping(); paint();
 })();
 
+/* ===================== server info panel ===================== */
+(function () {
+  var ov = $('info'), pill = $('status'), busy = false;
+  function fmt(ms) { return ms == null ? 'Unavailable' : Math.round(ms) + ' ms'; }
+  function dur(sec) {
+    sec = Math.round(sec); var d = Math.floor(sec / 86400), h = Math.floor(sec % 86400 / 3600), m = Math.floor(sec % 3600 / 60);
+    return d ? d + 'd ' + h + 'h' : h ? h + 'h ' + m + 'm' : m ? m + 'm ' + (sec % 60) + 's' : sec + 's';
+  }
+  /* Time to open a WebSocket to the proxy's /wisp/ endpoint. */
+  function wispPing() {
+    return new Promise(function (resolve) {
+      var t0 = performance.now(), done = false, ws;
+      var url = (location.protocol === 'https:' ? 'wss' : 'ws') + '://' + location.host + '/wisp/';
+      try { ws = new WebSocket(url); } catch (e) { return resolve(null); }
+      var to = setTimeout(function () { if (!done) { done = true; try { ws.close(); } catch (e) {} resolve(null); } }, 8000);
+      ws.onopen = function () { if (done) return; done = true; clearTimeout(to); var ms = performance.now() - t0; try { ws.close(); } catch (e) {} resolve(ms); };
+      ws.onerror = function () { if (done) return; done = true; clearTimeout(to); resolve(null); };
+    });
+  }
+  function measure() {
+    if (busy) return; busy = true;
+    $('i-status').textContent = $('status-text').textContent;
+    ['i-rtt', 'i-ping', 'i-ip', 'i-up'].forEach(function (id) { $(id).textContent = 'Measuring...'; });
+    var best = null, info = null;
+    function one() {
+      var t0 = performance.now();
+      return fetch('/api/info', { cache: 'no-store' }).then(function (r) {
+        var dt = performance.now() - t0;
+        if (!r.ok) throw new Error('missing');
+        return r.json().then(function (j) { info = j; if (best === null || dt < best) best = dt; });
+      });
+    }
+    one().then(one).then(one).catch(function () {
+      info = null;   /* /api/info not installed on the server yet: time a normal file instead */
+      var t0 = performance.now();
+      return fetch('/register-sw.js', { cache: 'no-store' }).then(function () { best = performance.now() - t0; }, function () { best = null; });
+    }).then(function () {
+      $('i-rtt').textContent = fmt(best);
+      $('i-ip').textContent = info ? (info.ip || 'Could not look it up') : 'Not available yet';
+      $('i-up').textContent = info && typeof info.uptime === 'number' ? dur(info.uptime) : 'Not available yet';
+      return wispPing();
+    }).then(function (ms) { $('i-ping').textContent = fmt(ms); busy = false; });
+  }
+  function show() { ov.hidden = false; measure(); }
+  pill.addEventListener('click', show);
+  pill.addEventListener('keydown', function (ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); show(); } });
+  $('i-refresh').addEventListener('click', measure);
+})();
+
 /* ===================== change log panel ===================== */
 (function () {
   var panel = document.getElementById('log'), openBtn = document.getElementById('logbtn');
@@ -634,7 +630,6 @@ var STATUS_NOTICE = '';
 /* ===================== settings ===================== */
 (function () {
   var ov = $('settings');
-  var MOD_CODE = '1234';   /* visible to anyone who views the page source: this is a fun lock, not security */
   var ENGINES = { ddg: 'https://duckduckgo.com/?q=', google: 'https://www.google.com/search?q=', bing: 'https://www.bing.com/search?q=' };
   var ICONS = {
     "default": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2305070f'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%235aa2ff'/%3E%3C/svg%3E",
@@ -642,73 +637,41 @@ var STATUS_NOTICE = '';
     globe: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='%235aa2ff' stroke-width='2.5'/%3E%3Cpath d='M4 16h24M16 4c-6 7-6 17 0 24M16 4c6 7 6 17 0 24' fill='none' stroke='%235aa2ff' stroke-width='2'/%3E%3C/svg%3E",
     blank: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E"
   };
-  var D = { engine: 'ddg', stars: true, shoot: true, title: '', icon: 'default', density: 1, freq: 1, rocket: 20, glow: 1, hidestatus: false };
-  var cfg = {};
-  Object.keys(D).forEach(function (k) { cfg[k] = store.get('tsw.' + k, D[k]); });
+  var cfg = { engine: store.get('tsw.engine', 'ddg'), stars: store.get('tsw.stars', true), shoot: store.get('tsw.shoot', true),
+              title: store.get('tsw.title', ''), icon: store.get('tsw.icon', 'default') };
   if (!ENGINES[cfg.engine]) cfg.engine = 'ddg';
   if (!ICONS[cfg.icon]) cfg.icon = 'default';
-  ['density', 'freq', 'rocket', 'glow'].forEach(function (k) { cfg[k] = parseFloat(cfg[k]); if (isNaN(cfg[k])) cfg[k] = D[k]; });
-  var unlocked = store.get('tsw.mod', false) === true;
-
   function apply() {
-    window.TSWSky = { stars: !!cfg.stars, shoot: !!cfg.shoot, density: cfg.density, freq: cfg.freq, rocket: cfg.rocket / 100, glow: cfg.glow };
+    window.TSWSky = { stars: !!cfg.stars, shoot: !!cfg.shoot };
     window.TSWSearch = function () { return ENGINES[cfg.engine]; };
     document.title = cfg.title || 'TSW v2';
     $('fav').href = ICONS[cfg.icon];
-    $('status').style.display = cfg.hidestatus ? 'none' : '';
   }
-  function put(k, v) { cfg[k] = v; store.set('tsw.' + k, v); apply(); }
   function fill() {
     $('set-engine').value = cfg.engine; $('set-stars').checked = !!cfg.stars; $('set-shoot').checked = !!cfg.shoot;
     $('set-title').value = cfg.title; $('set-icon').value = cfg.icon;
-    [['density', 'x'], ['freq', 'x'], ['rocket', '%'], ['glow', 'x']].forEach(function (p) {
-      $('mod-' + p[0]).value = cfg[p[0]]; $('out-' + p[0]).textContent = cfg[p[0]] + (p[1] === '%' ? '%' : '\u00d7');
-    });
-    $('mod-hidestatus').checked = !!cfg.hidestatus;
-    $('mod-lock').hidden = unlocked; $('mod-menu').hidden = !unlocked;
   }
-  $('set-engine').addEventListener('change', function () { put('engine', this.value); });
-  $('set-stars').addEventListener('change', function () { put('stars', this.checked); });
-  $('set-shoot').addEventListener('change', function () { put('shoot', this.checked); });
-  $('set-title').addEventListener('input', function () { put('title', this.value.trim()); });
-  $('set-icon').addEventListener('change', function () { put('icon', this.value); });
-  ['density', 'freq', 'rocket', 'glow'].forEach(function (k) {
-    $('mod-' + k).addEventListener('input', function () {
-      put(k, parseFloat(this.value)); fill();
-      if (k === 'density' && window.TSWSkyRefresh) window.TSWSkyRefresh();
-    });
-  });
-  $('mod-hidestatus').addEventListener('change', function () { put('hidestatus', this.checked); });
-  $('mod-rocketnow').addEventListener('click', function () { ov.hidden = true; if (window.TSWSkySpawn) window.TSWSkySpawn('rocket', 1); });
-  $('mod-storm').addEventListener('click', function () { ov.hidden = true; if (window.TSWSkySpawn) window.TSWSkySpawn('star', 8); });
-  function tryUnlock() {
-    var box = $('mod-code');
-    if (box.value.trim() === MOD_CODE) {
-      unlocked = true; store.set('tsw.mod', true); box.value = ''; $('mod-err').textContent = ''; fill();
-    } else {
-      $('mod-err').textContent = 'Wrong code.';
-      box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake');
-    }
-  }
-  $('mod-go').addEventListener('click', tryUnlock);
-  $('mod-code').addEventListener('keydown', function (ev) { if (ev.key === 'Enter') { ev.preventDefault(); tryUnlock(); } });
-  $('mod-lockbtn').addEventListener('click', function () { unlocked = false; store.del('tsw.mod'); fill(); });
+  $('set-engine').addEventListener('change', function () { cfg.engine = this.value; store.set('tsw.engine', cfg.engine); apply(); });
+  $('set-stars').addEventListener('change', function () { cfg.stars = this.checked; store.set('tsw.stars', cfg.stars); apply(); });
+  $('set-shoot').addEventListener('change', function () { cfg.shoot = this.checked; store.set('tsw.shoot', cfg.shoot); apply(); });
+  $('set-title').addEventListener('input', function () { cfg.title = this.value.trim(); store.set('tsw.title', cfg.title); apply(); });
+  $('set-icon').addEventListener('change', function () { cfg.icon = this.value; store.set('tsw.icon', cfg.icon); apply(); });
   $('set-reset').addEventListener('click', function () {
-    Object.keys(D).forEach(function (k) { store.del('tsw.' + k); cfg[k] = D[k]; });
-    fill(); apply(); if (window.TSWSkyRefresh) window.TSWSkyRefresh();
+    ['tsw.engine', 'tsw.stars', 'tsw.shoot', 'tsw.title', 'tsw.icon'].forEach(store.del);
+    cfg = { engine: 'ddg', stars: true, shoot: true, title: '', icon: 'default' }; fill(); apply();
   });
   $('cog').addEventListener('click', function () { fill(); ov.hidden = false; $('set-engine').focus(); });
   apply();
-  if (cfg.density !== 1 && window.TSWSkyRefresh) window.TSWSkyRefresh();
 })();
 
 /* shared behaviour for the settings and add-shortcut panels */
-['settings', 'addlink'].forEach(function (id) {
+$('gamesbtn').addEventListener('click', function () { $('games').hidden = false; });
+['settings', 'addlink', 'games', 'info'].forEach(function (id) {
   var el = $(id);
   el.addEventListener('click', function (ev) { if (ev.target === el || ev.target.closest('[data-close]')) el.hidden = true; });
 });
 document.addEventListener('keydown', function (ev) {
-  if (ev.key === 'Escape') { $('settings').hidden = true; $('addlink').hidden = true; }
+  if (ev.key === 'Escape') { ['settings', 'addlink', 'games', 'info'].forEach(function (id) { $(id).hidden = true; }); }
 });
 
 /* ===================== your own shortcuts ===================== */
