@@ -1,66 +1,299 @@
-<!doctype html>
-<html>
-	<head>
-		<meta charset="utf-8" />
-		<meta
-			name="viewport"
-			content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
-		/>
-		<title>Scramjet</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TSW v2</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2305070f'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%235aa2ff'/%3E%3C/svg%3E">
+<style>
+:root {
+  --void: #020308;
+  --panel: #0b0e17;
+  --edge: #1b2130;
+  --steel: #6b7488;
+  --ink: #d5dcec;
+  --blue: #5aa2ff;
+  --blue-dim: #2a4f86;
+  --bar: 3.25rem;
+}
+* { box-sizing: border-box; margin: 0; }
+html, body { height: 100%; background: var(--void); color: var(--ink); overflow: hidden;
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+#sky { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; }
 
-		<link rel="shortcut icon" content="favicon.webp" />
-	
-		<script src="/scram/scramjet.all.js"></script>
-		<script src="/baremux/index.js"></script>
-		
-		<link rel="stylesheet" href="index.css" />
-		<script src="register-sw.js" defer></script>
-		<script src="search.js" defer></script>
-		<script src="index.js" defer></script>
-	</head>
+/* ---------- home ---------- */
+#home { position: relative; z-index: 1; height: 100%; display: grid; place-items: center;
+  padding: 1.5rem; padding-bottom: 12vh; }
+#home[hidden] { display: none; }
+.hero { width: min(34rem, 100%); text-align: center; }
+.mark { font-size: clamp(2.6rem, 9vw, 4.2rem); font-weight: 200; letter-spacing: .32em;
+  padding-left: .32em; color: var(--ink); }
+.mark b { font-weight: 600; color: var(--blue); letter-spacing: .1em; margin-left: .35em; font-size: .55em; }
+.tag { color: var(--steel); margin: .4rem 0 2rem; font-size: .95rem; }
+.field { display: flex; align-items: center; gap: .5rem; background: rgba(11,14,23,.82);
+  border: 1px solid var(--edge); border-radius: 999px; padding: .35rem .4rem .35rem 1.1rem;
+  transition: border-color .2s, box-shadow .2s; backdrop-filter: blur(6px); }
+.field:focus-within { border-color: var(--blue-dim); box-shadow: 0 0 0 4px rgba(90,162,255,.08); }
+.field input { flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: var(--ink);
+  font: inherit; padding: .55rem 0; }
+.field input::placeholder { color: var(--steel); }
+.go { background: var(--blue); color: #03101f; border: 0; border-radius: 999px; width: 2.5rem; height: 2.5rem;
+  display: grid; place-items: center; cursor: pointer; flex: none; }
+.go:hover { background: #7cb5ff; }
+.go svg { width: 1.1rem; height: 1.1rem; }
+.msg { min-height: 1.5rem; margin-top: 1rem; color: #e59a9a; font-size: .9rem; }
+.note { position: fixed; left: 0; right: 0; bottom: max(.9rem, env(safe-area-inset-bottom)); text-align: center;
+  color: #454d60; font-size: .8rem; z-index: 1; padding: 0 1rem; }
 
-	<body>
-		<div title="Scramjet Logo" class="flex-center logo-wrapper header-center">
-			<img class="logo" src="sj.png" alt="Scramjet" />
-			<h1>Scramjet | MW</h1>
-		</div>
-		<div class="flex-center desc left-margin">
-			<p>
-				Scramjet is an experimental interception based web proxy designed to
-				evade internet censorship, bypass arbitrary web browser restrictions and
-				innovate web proxy technologies.
-			</p>
-		</div>
+.field.off { opacity: .55; cursor: not-allowed; }
+.field.off input { cursor: not-allowed; }
+.field.off .go { background: #3a4152; color: #8a93a6; cursor: not-allowed; }
+.shake { animation: shake .45s; }
+@keyframes shake { 10%,90% { transform: translateX(-2px); } 20%,80% { transform: translateX(4px); }
+  30%,50%,70% { transform: translateX(-7px); } 40%,60% { transform: translateX(7px); } }
+.msg { display: inline-block; }
+.cog { position: fixed; top: max(.9rem, env(safe-area-inset-top)); right: .9rem; z-index: 3; width: 2.5rem; height: 2.5rem;
+  display: grid; place-items: center; background: rgba(11,14,23,.6); border: 1px solid var(--edge);
+  color: var(--steel); border-radius: 50%; cursor: pointer; backdrop-filter: blur(6px); }
+.cog:hover { color: var(--ink); border-color: var(--blue-dim); }
+.cog svg { width: 1.2rem; height: 1.2rem; }
+.toast { position: fixed; top: calc(max(.9rem, env(safe-area-inset-top)) + 3.2rem); right: .9rem; z-index: 3;
+  background: #1a1018; border: 1px solid #5a2a35; color: #f0b4b4; border-radius: 10px; padding: .55rem .9rem;
+  font-size: .88rem; max-width: calc(100vw - 1.8rem); }
+.toast[hidden] { display: none; }
 
-		<form id="sj-form" class="flex-center">
-			<input
-				id="sj-search-engine"
-				value="https://www.google.com/search?q=%s"
-				type="hidden"
-			/>
-			<input id="sj-address" type="text" placeholder="Search the web freely" />
-		</form>
-		<div class="desc left-margin">
-			<p id="sj-error"></p>
-			<pre id="sj-error-code"></pre>
-		</div>
-		<footer>
-			<div>
-				<a
-					title="The Mercury Workshop GitHub organization"
-					href="https://github.com/MercuryWorkshop"
-					>Mercury Workshop</a
-				>
-				<a
-					title="The example demo app for Scramjet"
-					href="https://github.com/MercuryWorkshop/Scramjet-Demo"
-					>GitHub</a
-				>
-				<a title="License information" href="credits.html">Credits</a>
-			</div>
-			<div>
-				<span>Scramjet &copy; MW 2025</span>
-			</div>
-		</footer>
-	</body>
+/* ---------- browsing ---------- */
+#browse { position: fixed; inset: 0; z-index: 2; display: flex; flex-direction: column; background: var(--void); }
+#browse[hidden] { display: none; }
+.bar { height: var(--bar); flex: none; display: flex; align-items: center; gap: .35rem;
+  padding: 0 .6rem; padding-top: env(safe-area-inset-top); background: var(--panel);
+  border-bottom: 1px solid var(--edge); position: relative; }
+.bar button { background: none; border: 0; color: var(--steel); width: 2.2rem; height: 2.2rem; border-radius: 8px;
+  display: grid; place-items: center; cursor: pointer; flex: none; }
+.bar button:hover:not(:disabled) { color: var(--ink); background: #151a28; }
+.bar button:disabled { opacity: .3; cursor: default; }
+.bar svg { width: 1.15rem; height: 1.15rem; }
+.bar .addr { flex: 1; min-width: 0; background: var(--void); border: 1px solid var(--edge); color: var(--ink);
+  border-radius: 999px; padding: .4rem .9rem; font: inherit; font-size: .92rem; outline: 0; }
+.bar .addr:focus { border-color: var(--blue-dim); }
+.load { position: absolute; left: 0; bottom: -1px; height: 2px; width: 0; background: var(--blue); opacity: 0; }
+.load.on { opacity: 1; animation: load 8s cubic-bezier(.1,.6,.2,1) forwards; }
+@keyframes load { to { width: 92%; } }
+#view { flex: 1; min-height: 0; position: relative; }
+#view iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #fff; }
+.fail { position: absolute; inset: 0; display: grid; place-items: center; padding: 1.5rem; text-align: center; }
+.fail div { max-width: 28rem; }
+.fail h2 { font-weight: 500; font-size: 1.2rem; margin-bottom: .5rem; }
+.fail p { color: var(--steel); }
+.fail button { margin-top: 1.2rem; background: none; border: 1px solid var(--edge); color: var(--ink);
+  border-radius: 999px; padding: .5rem 1.2rem; font: inherit; cursor: pointer; }
+.fail button:hover { border-color: var(--blue-dim); }
+
+@media (max-width: 520px) { #btn-fwd, #btn-reload { display: none; } }
+@media (prefers-reduced-motion: reduce) { .shake { animation: none; } .load.on { animation-duration: 0s; width: 92%; } }
+</style>
+</head>
+<body>
+<canvas id="sky" aria-hidden="true"></canvas>
+<button class="cog" id="cog" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<main id="home">
+  <div class="hero">
+    <h1 class="mark">TSW<b>v2</b></h1>
+    <p class="tag">Type a website or a search.</p>
+    <form class="field" id="home-form" autocomplete="off">
+      <input id="home-input" type="text" inputmode="url" autocapitalize="off" spellcheck="false"
+             placeholder="Search or enter a web address" aria-label="Search or enter a web address">
+      <button class="go" type="submit" aria-label="Open">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </form>
+    <p class="msg" id="home-msg" role="status"></p>
+  </div>
+  <p class="note">Some sites block proxies and won't load.</p>
+</main>
+
+<section id="browse" hidden>
+  <div class="bar">
+    <button id="btn-home" title="Home" aria-label="Home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></svg></button>
+    <button id="btn-back" title="Back" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <button id="btn-fwd" title="Forward" aria-label="Forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+    <button id="btn-reload" title="Reload" aria-label="Reload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.5-5.8M20 4v5h-5"/></svg></button>
+    <input class="addr" id="addr" type="text" inputmode="url" autocapitalize="off" spellcheck="false" aria-label="Address">
+    <div class="load" id="load"></div>
+  </div>
+  <div id="view"></div>
+</section>
+
+<!-- Proxy engine scripts: order matters. These files are served by the Scramjet-App server. -->
+<script src="/baremux/index.js"></script>
+<script src="/scram/scramjet.all.js"></script>
+<script src="register-sw.js"></script>
+<script src="engine.js"></script>
+
+<script>
+/* ===================== stars + shooting stars ===================== */
+(function () {
+  var c = document.getElementById('sky'), g = c.getContext('2d');
+  var stars = [], shots = [], w = 0, h = 0, dpr = 1;
+  var COLORS = ['#ffffff', '#ffffff', '#ffffff', '#ffffff', '#eef4ff'];
+  var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function size() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = innerWidth; h = innerHeight;
+    c.width = w * dpr; c.height = h * dpr;
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var n = Math.round(w * h / 5200);
+    stars = [];
+    for (var i = 0; i < n; i++) {
+      stars.push({ x: Math.random() * w, y: Math.random() * h,
+        r: Math.random() < .12 ? 1.6 : Math.random() * .9 + .5,
+        a: Math.random() * .35 + .65, s: Math.random() * 2 + .6, p: Math.random() * 6.28,
+        c: COLORS[Math.floor(Math.random() * COLORS.length)] });
+    }
+  }
+  function spawn() {
+    var fromLeft = Math.random() < .5;
+    shots.push({ x: Math.random() * w * .8 + (fromLeft ? 0 : w * .2), y: Math.random() * h * .4,
+      vx: (fromLeft ? 1 : -1) * (6 + Math.random() * 4), vy: 2.4 + Math.random() * 2, life: 0, max: 55 + Math.random() * 25 });
+  }
+  var next = 0;
+  function frame(t) {
+    g.clearRect(0, 0, w, h);
+    for (var i = 0; i < stars.length; i++) {
+      var s = stars[i];
+      var tw = still ? 1 : .8 + .2 * Math.sin(t / 1000 * s.s + s.p);
+      g.globalAlpha = s.a * tw;
+      g.fillStyle = s.c;
+      g.beginPath(); g.arc(s.x, s.y, s.r, 0, 6.2832); g.fill();
+    }
+    if (!still) {
+      if (t > next) { spawn(); if (Math.random() < .3) spawn(); next = t + 1400 + Math.random() * 2600; }
+      for (var j = shots.length - 1; j >= 0; j--) {
+        var o = shots[j]; o.x += o.vx; o.y += o.vy; o.life++;
+        var f = 1 - o.life / o.max;
+        if (f <= 0) { shots.splice(j, 1); continue; }
+        var len = 20, tx = o.x - o.vx * len, ty = o.y - o.vy * len;
+        var grad = g.createLinearGradient(o.x, o.y, tx, ty);
+        grad.addColorStop(0, 'rgba(255,255,255,' + f + ')');
+        grad.addColorStop(1, 'rgba(255,255,255,0)');
+        g.globalAlpha = 1; g.strokeStyle = grad; g.lineWidth = 1.8;
+        g.beginPath(); g.moveTo(o.x, o.y); g.lineTo(tx, ty); g.stroke();
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+  addEventListener('resize', size);
+  size(); requestAnimationFrame(frame);
+})();
+
+/* ===================== navigation UI ===================== */
+/*
+  PROXY ENGINE CONNECTION POINT
+  This file does not contain the proxy engine. The Scramjet connection (service worker,
+  transport, controller) is added in the next stage as /engine.js, which must define:
+
+    window.TSWEngine = {
+      ready:    Promise,                      // resolves when the service worker + transport are ready
+      open:     function (url, container),    // loads url inside container, returns a handle
+      back:     function () {},               // optional
+      forward:  function () {},               // optional
+      reload:   function () {},               // optional
+      onload:   function (cb) {},             // optional; cb(currentUrl) when a page finishes loading
+    };
+
+  Until that file exists, opening a site shows an honest "engine not connected" message.
+*/
+(function () {
+  var home = document.getElementById('home'), browse = document.getElementById('browse');
+  var homeForm = document.getElementById('home-form'), homeInput = document.getElementById('home-input');
+  var homeMsg = document.getElementById('home-msg');
+  var addr = document.getElementById('addr'), view = document.getElementById('view'), load = document.getElementById('load');
+  var bBack = document.getElementById('btn-back'), bFwd = document.getElementById('btn-fwd'), bRel = document.getElementById('btn-reload');
+  var engine = null, current = '';
+  var SEARCH = 'https://duckduckgo.com/?q=';
+
+  function toUrl(text) {
+    text = text.trim();
+    if (!text) return '';
+    if (/^https?:\/\//i.test(text)) return text;
+    if (!/\s/.test(text) && /^[^\s.]+\.[^\s]{2,}$/.test(text)) return 'https://' + text;
+    if (/^localhost(:\d+)?(\/|$)/i.test(text)) return 'http://' + text;
+    return SEARCH + encodeURIComponent(text);
+  }
+  function loading(on) {
+    load.classList.remove('on'); void load.offsetWidth;
+    if (on) load.classList.add('on');
+  }
+  function fail(title, body) {
+    loading(false);
+    view.innerHTML = '';
+    var box = document.createElement('div'); box.className = 'fail';
+    var inner = document.createElement('div');
+    var h = document.createElement('h2'); h.textContent = title;
+    var p = document.createElement('p'); p.textContent = body;
+    var b = document.createElement('button'); b.textContent = 'Back to home';
+    b.onclick = goHome;
+    inner.append(h, p, b); box.append(inner); view.append(box);
+  }
+  function setNav() {
+    var e = window.TSWEngine;
+    bBack.disabled = !(e && e.back); bFwd.disabled = !(e && e.forward); bRel.disabled = !(e && e.reload);
+  }
+  function open(text) {
+    var url = toUrl(text);
+    if (!url) return;
+    try { new URL(url); } catch (_) { homeMsg.textContent = 'That doesn\u2019t look like a valid address.'; return; }
+    current = url; addr.value = url;
+    home.hidden = true; browse.hidden = false; setNav(); loading(true);
+    var e = window.TSWEngine;
+    if (!e) { fail('The proxy engine isn\u2019t connected yet', 'This page is the TSW v2 interface only. The Scramjet engine is added in the next build stage.'); return; }
+    Promise.resolve(e.ready).then(function () {
+      engine = e.open(url, view);
+      if (e.onload) e.onload(function (u) { loading(false); if (u) { current = u; addr.value = u; } });
+      else setTimeout(function () { loading(false); }, 1500);
+    }).catch(function (err) {
+      fail('Couldn\u2019t start the proxy', (err && err.message ? err.message + ' ' : '') +
+        'If the server was asleep, wait a minute and try again. Your browser also needs service workers enabled.');
+    });
+  }
+  function goHome() {
+    browse.hidden = true; home.hidden = false; view.innerHTML = ''; loading(false);
+    homeInput.value = ''; homeMsg.textContent = ''; if (online()) homeInput.focus();
+  }
+
+  var field = document.querySelector('.field'), toast = document.getElementById('toast'), toastTimer;
+  function online() { return !!window.TSWEngine; }   /* the search bar switches on by itself once /engine.js defines TSWEngine */
+  function shake(el) { el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
+  function syncField() {
+    var on = online();
+    field.classList.toggle('off', !on);
+    homeInput.readOnly = !on;
+    field.querySelector('.go').setAttribute('aria-disabled', String(!on));
+  }
+  function down() {
+    homeMsg.textContent = 'Web proxy down. Try again later.';
+    shake(field); shake(homeMsg);
+  }
+  field.addEventListener('mousedown', function (ev) { if (!online()) { ev.preventDefault(); down(); } });
+  field.addEventListener('touchstart', function () { if (!online()) down(); }, { passive: true });
+  document.getElementById('cog').addEventListener('click', function () {
+    toast.textContent = 'Settings are not available yet.';
+    toast.hidden = false; shake(toast);
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { toast.hidden = true; }, 2600);
+  });
+  syncField();
+  window.addEventListener('load', syncField);
+  homeForm.addEventListener('submit', function (ev) { ev.preventDefault(); if (!online()) { down(); return; } open(homeInput.value); });
+  addr.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') open(addr.value); });
+  addr.addEventListener('focus', function () { addr.select(); });
+  document.getElementById('btn-home').onclick = goHome;
+  bBack.onclick = function () { var e = window.TSWEngine; if (e && e.back) { loading(true); e.back(); } };
+  bFwd.onclick = function () { var e = window.TSWEngine; if (e && e.forward) { loading(true); e.forward(); } };
+  bRel.onclick = function () { var e = window.TSWEngine; if (e && e.reload) { loading(true); e.reload(); } };
+})();
+</script>
+</body>
 </html>
