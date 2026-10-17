@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>TSW v2</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2305070f'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%235aa2ff'/%3E%3C/svg%3E">
+<link rel="icon" id="fav" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2305070f'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%235aa2ff'/%3E%3C/svg%3E">
 <style>
 :root {
   --void: #020308;
@@ -46,11 +46,17 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
   color: #454d60; font-size: .8rem; z-index: 1; padding: 0 1rem; }
 
 .links { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem; margin-top: 1.2rem; }
-.links button { background: rgba(11,14,23,.82); border: 1px solid var(--edge); color: var(--ink); font: inherit;
-  font-size: .9rem; padding: .5rem 1.05rem; border-radius: 999px; cursor: pointer; backdrop-filter: blur(6px);
-  transition: border-color .2s, color .2s; }
-.links button:hover { border-color: var(--blue-dim); color: #fff; }
-.links.off button { opacity: .55; cursor: not-allowed; }
+.links > button, .chip { background: rgba(11,14,23,.82); border: 1px solid var(--edge); color: var(--ink); font: inherit;
+  font-size: .9rem; border-radius: 999px; cursor: pointer; backdrop-filter: blur(6px); transition: border-color .2s, color .2s; }
+.links > button { padding: .5rem 1.05rem; }
+.links > button:hover, .chip:hover { border-color: var(--blue-dim); color: #fff; }
+.chip { display: inline-flex; align-items: center; cursor: default; }
+.chip button { background: none; border: 0; color: inherit; font: inherit; cursor: pointer; padding: .5rem .35rem .5rem 1.05rem; }
+.chip .x { padding: .5rem .75rem .5rem .3rem; color: var(--steel); font-size: 1rem; line-height: 1; }
+.chip .x:hover { color: #ef8f8f; }
+#add-link { color: var(--steel); padding: .5rem .95rem; }
+.links.off > button:not(#add-link), .links.off .chip { opacity: .55; }
+.links.off .chip button:first-child, .links.off > button:not(#add-link) { cursor: not-allowed; }
 .field.off { opacity: .55; cursor: not-allowed; }
 .field.off input { cursor: not-allowed; }
 .field.off .go { background: #3a4152; color: #8a93a6; cursor: not-allowed; }
@@ -112,6 +118,33 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
 .pbody dt:first-child { margin-top: 0; }
 .pbody dd { margin: 0; color: #9aa3b8; }
 
+/* forms, settings, wake screen */
+.f label { display: block; font-size: .85rem; color: var(--steel); margin: .95rem 0 .3rem; }
+.f label:first-child { margin-top: 0; }
+.f input[type=text], .f select { width: 100%; background: var(--void); border: 1px solid var(--edge); color: var(--ink);
+  border-radius: 10px; padding: .55rem .7rem; font: inherit; outline: 0; }
+.f input[type=text]:focus, .f select:focus { border-color: var(--blue-dim); }
+.f .check { display: flex; align-items: center; gap: .6rem; color: var(--ink); font-size: .95rem; margin: .85rem 0 0; }
+.f .check input { accent-color: var(--blue); width: 1.05rem; height: 1.05rem; }
+.hint { color: var(--steel); font-size: .78rem; margin-top: .3rem; }
+.err { color: #e59a9a; font-size: .85rem; min-height: 1.2rem; margin-top: .6rem; }
+.row { display: flex; gap: .6rem; margin-top: 1rem; align-items: center; }
+.plain { background: none; border: 1px solid var(--edge); color: var(--ink); font: inherit; border-radius: 999px;
+  padding: .45rem 1rem; cursor: pointer; margin-top: 1rem; }
+.row .plain { margin-top: 0; }
+.plain:hover { border-color: var(--blue-dim); }
+.primary { background: var(--blue); color: #03101f; border: 0; border-radius: 999px; padding: .5rem 1.2rem; font: inherit; cursor: pointer; }
+.primary:hover { background: #7cb5ff; }
+.pbody h3.older { margin-top: 1.5rem; }
+.pbody h3.made { font-size: 1.2rem; }
+.wake { z-index: 6; background: rgba(2,3,8,.9); }
+.wakebox { text-align: center; max-width: 24rem; }
+.wakebox h2 { font-weight: 500; font-size: 1.15rem; margin: 1rem 0 .4rem; }
+.wakebox p { color: var(--steel); }
+.spin { width: 2rem; height: 2rem; margin: 0 auto; border: 2px solid var(--edge); border-top-color: var(--blue);
+  border-radius: 50%; animation: spin .9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
 /* ---------- browsing ---------- */
 #browse { position: fixed; inset: 0; z-index: 2; display: flex; flex-direction: column; background: var(--void); }
 #browse[hidden] { display: none; }
@@ -140,7 +173,7 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
 .fail button:hover { border-color: var(--blue-dim); }
 
 @media (max-width: 520px) { #btn-fwd, #btn-reload { display: none; } }
-@media (prefers-reduced-motion: reduce) { .shake, .status .dot { animation: none; } .load.on { animation-duration: 0s; width: 92%; } }
+@media (prefers-reduced-motion: reduce) { .shake, .status .dot, .spin { animation: none; } .load.on { animation-duration: 0s; width: 92%; } }
 </style>
 </head>
 <body>
@@ -155,12 +188,61 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
   <span id="status-text">Checking server…</span>
 </div>
 
+<div class="overlay" id="settings" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="set-h">
+    <div class="phead"><h2 id="set-h">Settings</h2><button data-close aria-label="Close">&times;</button></div>
+    <div class="pbody f">
+      <label for="set-engine">Search engine</label>
+      <select id="set-engine"><option value="ddg">DuckDuckGo</option><option value="google">Google</option><option value="bing">Bing</option></select>
+      <p class="hint">Google may ask you to prove you are not a robot.</p>
+      <label class="check"><input type="checkbox" id="set-stars"> Stars</label>
+      <label class="check"><input type="checkbox" id="set-shoot"> Shooting stars</label>
+      <label for="set-title">Tab title</label>
+      <input id="set-title" type="text" maxlength="40" placeholder="TSW v2" autocomplete="off">
+      <label for="set-icon">Tab icon</label>
+      <select id="set-icon"><option value="default">TSW v2</option><option value="doc">Document</option><option value="globe">Globe</option><option value="blank">Blank</option></select>
+      <p class="hint">Settings are saved in this browser. The tab title and icon only change the TSW v2 tab.</p>
+      <button type="button" class="plain" id="set-reset">Reset to defaults</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="addlink" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="al-h">
+    <div class="phead"><h2 id="al-h">Add a shortcut</h2><button data-close aria-label="Close">&times;</button></div>
+    <form class="pbody f" id="al-form" autocomplete="off">
+      <label for="al-name">Name</label>
+      <input id="al-name" type="text" maxlength="20" placeholder="YouTube">
+      <label for="al-url">Web address</label>
+      <input id="al-url" type="text" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="youtube.com">
+      <p class="err" id="al-err" role="alert"></p>
+      <div class="row"><button class="primary" type="submit">Add shortcut</button><button class="plain" type="button" data-close>Cancel</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="overlay wake" id="wake" hidden role="alertdialog" aria-labelledby="wake-t">
+  <div class="wakebox">
+    <div class="spin" aria-hidden="true"></div>
+    <h2 id="wake-t">Waking the server up</h2>
+    <p id="wake-p">This can take up to a minute. The page reloads by itself when it is ready.</p>
+    <button type="button" class="plain" id="wake-x" hidden>Dismiss</button>
+  </div>
+</div>
+
 <div class="overlay" id="log" hidden>
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="log-title">
     <div class="phead"><h2 id="log-title">Change log</h2><button id="log-close" aria-label="Close">&times;</button></div>
     <div class="tabs"><button class="on" data-tab="updates">Updates</button><button data-tab="credits">Credits</button></div>
     <div class="pbody" id="tab-updates">
-      <h3>TSW v2 1.0<span>Site launch</span></h3>
+      <h3>TSW v2 1.1<span>Settings and shortcuts</span></h3>
+      <p class="date">October 2026</p>
+      <ul>
+        <li>Settings now work: choose a search engine, turn stars and shooting stars on or off, and change the tab title and icon.</li>
+        <li>Add your own shortcuts with the + button. They are saved in your browser.</li>
+        <li>A waking-up screen shows while the server starts back up.</li>
+      </ul>
+      <h3 class="older">TSW v2 1.0<span>Site launch</span></h3>
       <p class="date">October 2026</p>
       <ul>
         <li>TSW v2 goes live with a real web proxy built on the Scramjet engine.</li>
@@ -170,6 +252,8 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
       </ul>
     </div>
     <div class="pbody" id="tab-credits" hidden>
+      <h3 class="made">Made by Alex Dalbey</h3>
+      <p class="date">Built with</p>
       <dl>
         <dt>Scramjet</dt><dd>The web proxy engine, by Mercury Workshop (MIT license).</dd>
         <dt>Scramjet-App</dt><dd>The server this site is built on, by Mercury Workshop (AGPL-3.0 license).</dd>
@@ -220,6 +304,12 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
 <script src="engine.js"></script>
 
 <script>
+function $(id) { return document.getElementById(id); }
+var store = {
+  get: function (k, d) { try { var v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+  del: function (k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
 /* ===================== stars + shooting stars ===================== */
 (function () {
   var c = document.getElementById('sky'), g = c.getContext('2d');
@@ -249,14 +339,16 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
   var next = 0;
   function frame(t) {
     g.clearRect(0, 0, w, h);
-    for (var i = 0; i < stars.length; i++) {
+    var cfg = window.TSWSky || {}, showStars = cfg.stars !== false, showShots = cfg.shoot !== false;
+    if (!showShots) shots.length = 0;
+    for (var i = 0; showStars && i < stars.length; i++) {
       var s = stars[i];
       var tw = still ? 1 : .8 + .2 * Math.sin(t / 1000 * s.s + s.p);
       g.globalAlpha = s.a * tw;
       g.fillStyle = s.c;
       g.beginPath(); g.arc(s.x, s.y, s.r, 0, 6.2832); g.fill();
     }
-    if (!still) {
+    if (!still && showShots) {
       if (t > next) { spawn(); if (Math.random() < .3) spawn(); next = t + 1400 + Math.random() * 2600; }
       for (var j = shots.length - 1; j >= 0; j--) {
         var o = shots[j]; o.x += o.vx; o.y += o.vy; o.life++;
@@ -276,18 +368,18 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
   size(); requestAnimationFrame(frame);
 })();
 
-/* ===================== server status ===================== */
+/* ===================== server status + wake screen ===================== */
 /* Set STATUS_NOTICE to a short message to show the yellow "maintenance" state, e.g.
    var STATUS_NOTICE = 'Maintenance tonight. Sites may fail.';
    Set it back to '' to return to green. Red and green are detected automatically. */
 var STATUS_NOTICE = '';
 (function () {
-  var box = document.getElementById('status'), text = document.getElementById('status-text');
-  var engineOk = null, pingOk = true;
+  var box = $('status'), text = $('status-text'), wake = $('wake'), wakeText = $('wake-p'), wakeX = $('wake-x');
+  var engineOk = null, pingOk = true, lastActive = Date.now(), lastPing = 0, waking = false, wakeId = 0;
   function paint() {
     var st, msg;
     if (engineOk === false || !pingOk) { st = 'down'; msg = 'Proxy servers down'; }
-    else if (engineOk === null) { st = 'check'; msg = 'Checking server\u2026'; }
+    else if (engineOk === null) { st = 'check'; msg = 'Checking server…'; }
     else if (STATUS_NOTICE) { st = 'warn'; msg = STATUS_NOTICE; }
     else { st = 'up'; msg = 'Active'; }
     box.setAttribute('data-s', st); text.textContent = msg;
@@ -296,12 +388,50 @@ var STATUS_NOTICE = '';
     Promise.resolve(window.TSWEngine.ready).then(function () { engineOk = true; paint(); },
                                                  function () { engineOk = false; paint(); });
   } else { engineOk = false; }
-  function ping() {
-    fetch('/', { method: 'HEAD', cache: 'no-store' })
-      .then(function (r) { pingOk = r.ok; }, function () { pingOk = false; })
-      .then(paint);
+
+  /* Asks the server for one of its own files, so Render's loading page does not count as "up". */
+  function check() {
+    var ctl = new AbortController(), t = setTimeout(function () { ctl.abort(); }, 10000);
+    return fetch('/register-sw.js', { cache: 'no-store', signal: ctl.signal })
+      .then(function (r) { return r.ok ? r.text() : Promise.reject(); })
+      .then(function (txt) { clearTimeout(t); return txt.indexOf('registerSW') > -1; })
+      .catch(function () { clearTimeout(t); return false; });
   }
-  setInterval(ping, 60000); ping(); paint();
+  function startWake() {
+    if (waking) return;
+    waking = true; var id = ++wakeId;
+    wake.hidden = false; wakeX.hidden = true;
+    wakeText.textContent = 'This can take up to a minute. The page reloads by itself when it is ready.';
+    setTimeout(function () {
+      if (waking && id === wakeId) {
+        wakeText.textContent = 'Still trying. If this keeps going, the server may be down or you may be offline.';
+        wakeX.hidden = false;
+      }
+    }, 90000);
+    (function retry() {
+      if (!waking || id !== wakeId) return;
+      check().then(function (ok) {
+        if (!waking || id !== wakeId) return;
+        if (ok) location.reload(); else setTimeout(retry, 4000);
+      });
+    })();
+  }
+  wakeX.addEventListener('click', function () { waking = false; wakeId++; wake.hidden = true; });
+  function ping() {
+    lastPing = Date.now();
+    check().then(function (ok) { pingOk = ok; paint(); if (!ok) startWake(); });
+  }
+  /* Only ping while the tab is open, visible and recently used, so an old forgotten tab
+     does not keep the free server awake and use up its monthly hours. */
+  function activity() {
+    lastActive = Date.now();
+    if (!waking && Date.now() - lastPing > 60000 && document.visibilityState === 'visible') ping();
+  }
+  ['pointerdown', 'keydown', 'touchstart'].forEach(function (ev) { addEventListener(ev, activity, { passive: true }); });
+  setInterval(function () {
+    if (document.visibilityState === 'visible' && Date.now() - lastActive < 600000 && Date.now() - lastPing >= 60000) ping();
+  }, 30000);
+  ping(); paint();
 })();
 
 /* ===================== change log panel ===================== */
@@ -320,6 +450,95 @@ var STATUS_NOTICE = '';
       document.getElementById('tab-credits').hidden = b.dataset.tab !== 'credits';
     });
   });
+})();
+
+/* ===================== settings ===================== */
+(function () {
+  var ov = $('settings');
+  var ENGINES = { ddg: 'https://duckduckgo.com/?q=', google: 'https://www.google.com/search?q=', bing: 'https://www.bing.com/search?q=' };
+  var ICONS = {
+    "default": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2305070f'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%235aa2ff'/%3E%3C/svg%3E",
+    doc: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M8 3h11l6 6v20H8z' fill='%23dfe5f0'/%3E%3Cpath d='M19 3v6h6z' fill='%23aab4c9'/%3E%3C/svg%3E",
+    globe: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='%235aa2ff' stroke-width='2.5'/%3E%3Cpath d='M4 16h24M16 4c-6 7-6 17 0 24M16 4c6 7 6 17 0 24' fill='none' stroke='%235aa2ff' stroke-width='2'/%3E%3C/svg%3E",
+    blank: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E"
+  };
+  var cfg = { engine: store.get('tsw.engine', 'ddg'), stars: store.get('tsw.stars', true), shoot: store.get('tsw.shoot', true),
+              title: store.get('tsw.title', ''), icon: store.get('tsw.icon', 'default') };
+  if (!ENGINES[cfg.engine]) cfg.engine = 'ddg';
+  if (!ICONS[cfg.icon]) cfg.icon = 'default';
+  function apply() {
+    window.TSWSky = { stars: !!cfg.stars, shoot: !!cfg.shoot };
+    window.TSWSearch = function () { return ENGINES[cfg.engine]; };
+    document.title = cfg.title || 'TSW v2';
+    $('fav').href = ICONS[cfg.icon];
+  }
+  function fill() {
+    $('set-engine').value = cfg.engine; $('set-stars').checked = !!cfg.stars; $('set-shoot').checked = !!cfg.shoot;
+    $('set-title').value = cfg.title; $('set-icon').value = cfg.icon;
+  }
+  $('set-engine').addEventListener('change', function () { cfg.engine = this.value; store.set('tsw.engine', cfg.engine); apply(); });
+  $('set-stars').addEventListener('change', function () { cfg.stars = this.checked; store.set('tsw.stars', cfg.stars); apply(); });
+  $('set-shoot').addEventListener('change', function () { cfg.shoot = this.checked; store.set('tsw.shoot', cfg.shoot); apply(); });
+  $('set-title').addEventListener('input', function () { cfg.title = this.value.trim(); store.set('tsw.title', cfg.title); apply(); });
+  $('set-icon').addEventListener('change', function () { cfg.icon = this.value; store.set('tsw.icon', cfg.icon); apply(); });
+  $('set-reset').addEventListener('click', function () {
+    ['tsw.engine', 'tsw.stars', 'tsw.shoot', 'tsw.title', 'tsw.icon'].forEach(store.del);
+    cfg = { engine: 'ddg', stars: true, shoot: true, title: '', icon: 'default' }; fill(); apply();
+  });
+  $('cog').addEventListener('click', function () { fill(); ov.hidden = false; $('set-engine').focus(); });
+  apply();
+})();
+
+/* shared behaviour for the settings and add-shortcut panels */
+['settings', 'addlink'].forEach(function (id) {
+  var el = $(id);
+  el.addEventListener('click', function (ev) { if (ev.target === el || ev.target.closest('[data-close]')) el.hidden = true; });
+});
+document.addEventListener('keydown', function (ev) {
+  if (ev.key === 'Escape') { $('settings').hidden = true; $('addlink').hidden = true; }
+});
+
+/* ===================== your own shortcuts ===================== */
+(function () {
+  var links = $('links'), MAX = 8;
+  var plus = document.createElement('button');
+  plus.type = 'button'; plus.id = 'add-link'; plus.textContent = '+'; plus.title = 'Add a shortcut'; plus.setAttribute('aria-label', 'Add a shortcut');
+  function list() { var l = store.get('tsw.links', []); return Array.isArray(l) ? l : []; }
+  function render() {
+    links.querySelectorAll('.custom, #add-link').forEach(function (n) { n.remove(); });
+    var l = list();
+    l.forEach(function (item, i) {
+      var chip = document.createElement('span'); chip.className = 'chip custom';
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = item.name; b.setAttribute('data-url', item.url);
+      var x = document.createElement('button'); x.type = 'button'; x.className = 'x'; x.textContent = '×';
+      x.setAttribute('aria-label', 'Remove ' + item.name); x.setAttribute('data-remove', i);
+      chip.appendChild(b); chip.appendChild(x); links.appendChild(chip);
+    });
+    if (l.length < MAX) links.appendChild(plus);
+  }
+  function norm(t) {
+    t = t.trim(); if (!t) return '';
+    if (!/^https?:\/\//i.test(t)) t = 'https://' + t;
+    try { var u = new URL(t); return u.hostname.indexOf('.') > 0 ? u.href : ''; } catch (e) { return ''; }
+  }
+  plus.addEventListener('click', function () {
+    $('al-name').value = ''; $('al-url').value = ''; $('al-err').textContent = '';
+    $('addlink').hidden = false; $('al-name').focus();
+  });
+  links.addEventListener('click', function (ev) {
+    var x = ev.target.closest('button[data-remove]');
+    if (!x) return;
+    var l = list(); l.splice(parseInt(x.getAttribute('data-remove'), 10), 1); store.set('tsw.links', l); render();
+  });
+  $('al-form').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var url = norm($('al-url').value);
+    if (!url) { $('al-err').textContent = 'Enter a web address like youtube.com.'; return; }
+    var name = $('al-name').value.trim() || new URL(url).hostname.replace(/^www\./, '');
+    var l = list(); l.push({ name: name, url: url }); store.set('tsw.links', l);
+    $('addlink').hidden = true; render();
+  });
+  render();
 })();
 
 /* ===================== navigation UI ===================== */
@@ -354,7 +573,7 @@ var STATUS_NOTICE = '';
     if (/^https?:\/\//i.test(text)) return text;
     if (!/\s/.test(text) && /^[^\s.]+\.[^\s]{2,}$/.test(text)) return 'https://' + text;
     if (/^localhost(:\d+)?(\/|$)/i.test(text)) return 'http://' + text;
-    return SEARCH + encodeURIComponent(text);
+    return (window.TSWSearch ? window.TSWSearch() : SEARCH) + encodeURIComponent(text);
   }
   function loading(on) {
     load.classList.remove('on'); void load.offsetWidth;
@@ -413,11 +632,6 @@ var STATUS_NOTICE = '';
   }
   field.addEventListener('mousedown', function (ev) { if (!online()) { ev.preventDefault(); down(); } });
   field.addEventListener('touchstart', function () { if (!online()) down(); }, { passive: true });
-  document.getElementById('cog').addEventListener('click', function () {
-    toast.textContent = 'Settings are not available yet.';
-    toast.hidden = false; shake(toast);
-    clearTimeout(toastTimer); toastTimer = setTimeout(function () { toast.hidden = true; }, 2600);
-  });
   document.getElementById('links').addEventListener('click', function (ev) {
     var b = ev.target.closest('button[data-url]');
     if (!b) return;
