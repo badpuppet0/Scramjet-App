@@ -58,7 +58,30 @@ fastify.register(fastifyStatic, {
 	decorateReply: false,
 });
 
-fastify.setNotFoundHandler((res, reply) => {
+let ipCache = { value: null, at: 0 };
+async function serverIp() {
+	if (ipCache.value && Date.now() - ipCache.at < 10 * 60 * 1000) return ipCache.value;
+	try {
+		const r = await fetch("https://api.ipify.org?format=json", {
+			signal: AbortSignal.timeout(4000),
+		});
+		const j = await r.json();
+		if (j && typeof j.ip === "string") {
+			ipCache = { value: j.ip, at: Date.now() };
+			return j.ip;
+		}
+	} catch (e) {}
+	return ipCache.value;
+}
+
+fastify.get("/api/info", async (req, reply) => {
+	reply.header("Cache-Control", "no-store");
+	return {
+		time: Date.now(),
+		uptime: Math.round(process.uptime()),
+		ip: await serverIp(),
+	};
+});fastify.setNotFoundHandler((res, reply) => {
 	return reply.code(404).type("text/html").sendFile("404.html");
 });
 
