@@ -45,6 +45,12 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
 .note { position: fixed; left: 0; right: 0; bottom: max(.9rem, env(safe-area-inset-bottom)); text-align: center;
   color: #454d60; font-size: .8rem; z-index: 1; padding: 0 1rem; }
 
+.links { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem; margin-top: 1.2rem; }
+.links button { background: rgba(11,14,23,.82); border: 1px solid var(--edge); color: var(--ink); font: inherit;
+  font-size: .9rem; padding: .5rem 1.05rem; border-radius: 999px; cursor: pointer; backdrop-filter: blur(6px);
+  transition: border-color .2s, color .2s; }
+.links button:hover { border-color: var(--blue-dim); color: #fff; }
+.links.off button { opacity: .55; cursor: not-allowed; }
 .field.off { opacity: .55; cursor: not-allowed; }
 .field.off input { cursor: not-allowed; }
 .field.off .go { background: #3a4152; color: #8a93a6; cursor: not-allowed; }
@@ -109,6 +115,11 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </button>
     </form>
+    <nav class="links" id="links" aria-label="Shortcuts">
+      <button type="button" data-url="https://www.tiktok.com">TikTok</button>
+      <button type="button" data-url="https://www.instagram.com">Instagram</button>
+      <button type="button" data-url="https://play.geforcenow.com">GeForce NOW</button>
+    </nav>
     <p class="msg" id="home-msg" role="status"></p>
   </div>
   <p class="note">Some sites block proxies and won't load.</p>
@@ -270,6 +281,7 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
   function syncField() {
     var on = online();
     field.classList.toggle('off', !on);
+    document.getElementById('links').classList.toggle('off', !on);
     homeInput.readOnly = !on;
     field.querySelector('.go').setAttribute('aria-disabled', String(!on));
   }
@@ -283,6 +295,12 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
     toast.textContent = 'Settings are not available yet.';
     toast.hidden = false; shake(toast);
     clearTimeout(toastTimer); toastTimer = setTimeout(function () { toast.hidden = true; }, 2600);
+  });
+  document.getElementById('links').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button[data-url]');
+    if (!b) return;
+    if (!online()) { down(); return; }
+    open(b.getAttribute('data-url'));
   });
   syncField();
   window.addEventListener('load', syncField);
