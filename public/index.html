@@ -17,6 +17,7 @@
   --ink: #d5dcec;
   --blue: #5aa2ff;
   --blue-dim: #2a4f86;
+  --blue-hi: #7cb5ff;
   --bar: 3.25rem;
 }
 * { box-sizing: border-box; margin: 0; }
@@ -42,7 +43,7 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
 .field input::placeholder { color: var(--steel); }
 .go { background: var(--blue); color: #03101f; border: 0; border-radius: 999px; width: 2.5rem; height: 2.5rem;
   display: grid; place-items: center; cursor: pointer; flex: none; }
-.go:hover { background: #7cb5ff; }
+.go:hover { background: var(--blue-hi); }
 .go svg { width: 1.1rem; height: 1.1rem; }
 .msg { min-height: 1.5rem; margin-top: 1rem; color: #e59a9a; font-size: .9rem; }
 .note { position: fixed; left: 0; right: 0; bottom: max(.9rem, env(safe-area-inset-bottom)); text-align: center;
@@ -137,7 +138,7 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
 .row .plain { margin-top: 0; }
 .plain:hover { border-color: var(--blue-dim); }
 .primary { background: var(--blue); color: #03101f; border: 0; border-radius: 999px; padding: .5rem 1.2rem; font: inherit; cursor: pointer; }
-.primary:hover { background: #7cb5ff; }
+.primary:hover { background: var(--blue-hi); }
 .pbody h3.older { margin-top: 1.5rem; }
 .pbody h3.made { font-size: 1.2rem; }
 .wake { z-index: 6; background: rgba(2,3,8,.9); }
@@ -240,9 +241,48 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
   .plain, .primary { padding: .7rem 1.3rem; }
   .diag .plain, .diag a.plain { padding: .65rem 1.1rem; }
 }
+
+/* ---- v1.4 additions ---- */
+#bgvid { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; pointer-events: none; }
+#bgvid[hidden] { display: none; }
+.clock { color: var(--steel); font-size: 1.05rem; margin: .5rem 0 0; min-height: 1.6rem; font-variant-numeric: tabular-nums; }
+.clock[hidden] { display: none; }
+.tag { transition: opacity .4s; }
+#splash { position: fixed; inset: 0; z-index: 50; background: var(--void); display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 1.4rem; transition: opacity .6s; animation: spgone .01s 7s forwards; }
+#splash.out { opacity: 0; pointer-events: none; }
+@keyframes spgone { to { opacity: 0; visibility: hidden; pointer-events: none; } }
+.sp-mark { font-size: clamp(2.4rem, 9vw, 4rem); font-weight: 200; letter-spacing: .32em; padding-left: .32em; }
+.sp-mark b { font-weight: 600; color: var(--blue); letter-spacing: .1em; margin-left: .35em; font-size: .55em; }
+.sp-bar { width: 9rem; height: 2px; background: var(--edge); overflow: hidden; border-radius: 2px; }
+.sp-bar i { display: block; height: 100%; width: 40%; background: var(--blue); animation: spbar 1s ease-in-out infinite; }
+@keyframes spbar { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+.hist { display: flex; gap: 2px; align-items: stretch; height: 28px; margin-top: .6rem; }
+.hist i { flex: 1; max-width: 8px; min-width: 3px; border-radius: 2px; background: #3ddc84; opacity: .85; }
+.hist i.bad { background: #ef5350; opacity: 1; }
+.pbody .credits { list-style: none; padding: 0; margin: 0; }
+.pbody .credits li { display: flex; flex-direction: column; padding: .65rem 0; border-bottom: 1px solid var(--edge); margin: 0; }
+.pbody .credits a { color: var(--ink); font-weight: 500; text-decoration: none; }
+.pbody .credits a::after { content: " \2197"; color: var(--steel); }
+.pbody .credits a:hover { color: var(--blue); }
+.pbody .credits span { color: var(--steel); font-size: .85rem; }
+.pbody a.plain-link { color: var(--blue); }
+.gamegrid { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin-top: .6rem; }
+.gcard { text-align: left; background: rgba(255,255,255,.02); border: 1px solid var(--edge); border-radius: 12px;
+  padding: .8rem .9rem; color: var(--ink); font: inherit; cursor: pointer; }
+.gcard:hover { border-color: var(--blue-dim); }
+.gcard b { display: block; font-weight: 500; }
+.gcard small { color: var(--steel); font-size: .78rem; }
+.filebtn { display: inline-block; cursor: pointer; margin-top: 0; }
+.filebtn input { display: none; }
+.f input[type=color] { width: 3.2rem; height: 2.4rem; padding: 0; border: 1px solid var(--edge); border-radius: 8px; background: var(--void); cursor: pointer; }
+.f input[type=range] { width: 100%; accent-color: var(--blue); }
+.vidnote { color: #e6d49a; font-size: .82rem; min-height: 1.1rem; margin-top: .4rem; }
 </style>
 </head>
 <body>
+<div id="splash" aria-hidden="true"><div class="sp-mark">TSW<b>v2</b></div><div class="sp-bar"><i></i></div></div>
+<video id="bgvid" muted loop playsinline preload="auto" aria-hidden="true" hidden></video>
 <canvas id="sky" aria-hidden="true"></canvas>
 <button class="cog" id="cog" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
 <button class="cog log" id="logbtn" aria-label="Change log" title="Change log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h7"/></svg></button>
@@ -262,9 +302,28 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
       <label for="set-engine">Search engine</label>
       <select id="set-engine"><option value="ddg">DuckDuckGo</option><option value="google">Google</option><option value="bing">Bing</option><option value="brave">Brave</option><option value="startpage">Startpage</option><option disabled>Tor (coming soon)</option></select>
       <p class="hint">Google may ask you to prove you are not a robot.</p>
+
       <label for="set-bg">Background</label>
-      <select id="set-bg"><option value="stars">Stars</option><option value="ice">Ice waves (interactive)</option><option disabled>Aurora (coming soon)</option><option disabled>More coming soon</option></select>
+      <select id="set-bg"><option value="stars">Stars</option><option value="ice">Ice waves (interactive)</option><option value="aurora">Aurora</option><option value="rain">Rain on glass</option><option value="city">City lights</option><option value="ocean">Night ocean</option><option value="solid">Solid color</option><option value="video">Video</option><option disabled>More coming soon</option></select>
       <p class="hint">Ice waves react to your mouse or finger. On the stars background, click a star to make it shine.</p>
+      <label for="set-solid">Solid color</label>
+      <input type="color" id="set-solid" value="#0a0f1c">
+
+      <label for="set-vsrc">Video source</label>
+      <select id="set-vsrc"><option value="site">Site video</option><option value="mine">My video (from this device)</option></select>
+      <div class="row" style="margin-top:.7rem">
+        <label class="plain filebtn">Choose a video<input type="file" id="vid-file" accept="video/*"></label>
+        <button type="button" class="plain" id="vid-remove">Remove my video</button>
+      </div>
+      <label for="set-vbright">Video brightness</label>
+      <input type="range" id="set-vbright" min="20" max="100" step="5">
+      <p class="vidnote" id="vid-note" role="status"></p>
+      <p class="hint">Your own video stays on this device and is only used by you. Short loops work best.</p>
+
+      <label for="set-accent">Accent color</label>
+      <select id="set-accent"><option value="blue">Blue</option><option value="green">Green</option><option value="pink">Pink</option><option value="orange">Orange</option><option value="violet">Violet</option></select>
+      <label for="set-clock">Clock</label>
+      <select id="set-clock"><option value="12">12-hour</option><option value="24">24-hour</option><option value="off">Off</option></select>
       <label for="set-season">Seasonal effects</label>
       <select id="set-season"><option value="auto">Automatic</option><option value="snow">Snow</option><option value="bats">Bats</option><option value="off">Off</option></select>
       <p class="hint">Automatic shows snow in winter and bats around Halloween.</p>
@@ -288,11 +347,15 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="gm-h">
     <div class="phead"><h2 id="gm-h">Games</h2><button data-close aria-label="Close">&times;</button></div>
     <div class="pbody">
-      <p class="hint" style="font-size:.95rem;margin:0 0 .4rem">Games are coming soon.</p>
-      <div class="soonrow"><div><b>Arcade</b><small>Quick classic games.</small></div><span class="badge">Coming soon</span></div>
-      <div class="soonrow"><div><b>Puzzle</b><small>Brain teasers and word games.</small></div><span class="badge">Coming soon</span></div>
-      <div class="soonrow"><div><b>Racing</b><small>Fast and simple racers.</small></div><span class="badge">Coming soon</span></div>
-      <div class="soonrow"><div><b>Multiplayer</b><small>Play with friends.</small></div><span class="badge">Coming soon</span></div>
+      <p class="hint" style="font-size:.92rem;margin:0 0 .4rem">Game sites that open through the proxy. Many games need features proxies cannot always handle, so some will not work.</p>
+      <div class="gamegrid">
+        <button class="gcard" data-site="https://poki.com"><b>Poki</b><small>Free browser games</small></button>
+        <button class="gcard" data-site="https://www.crazygames.com"><b>CrazyGames</b><small>Free browser games</small></button>
+        <button class="gcard" data-site="https://www.y8.com"><b>Y8</b><small>Free browser games</small></button>
+        <button class="gcard" data-site="https://itch.io/games/html5"><b>itch.io</b><small>Indie HTML5 games</small></button>
+        <button class="gcard" data-site="https://www.coolmathgames.com"><b>Coolmath Games</b><small>Puzzle and strategy</small></button>
+        <button class="gcard" data-site="https://play.geforcenow.com"><b>GeForce NOW</b><small>Cloud gaming</small></button>
+      </div>
     </div>
   </div>
 </div>
@@ -309,7 +372,10 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
         <div><dt>Server uptime</dt><dd id="i-up">-</dd></div>
       </dl>
       <p class="hint" style="margin-top:.9rem">Response time is the round trip to the server. Proxy ping is the time to open the proxy's WebSocket connection, so it includes connection setup and reads higher than a plain ping. The IP address is the server's outside address, which is what websites see.</p>
-      <div class="row"><button class="primary" type="button" id="i-refresh">Refresh</button></div>
+      <h4 class="subh">History <small style="color:var(--steel);font-weight:400">checks from this browser</small></h4>
+      <div class="hist" id="hist" aria-label="Recent checks"></div>
+      <p class="hint" id="hist-sum"></p>
+      <div class="row"><button class="primary" type="button" id="i-refresh">Refresh</button><button class="plain" type="button" id="i-clear">Clear history</button></div>
     </div>
   </div>
 </div>
@@ -342,7 +408,19 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
     <div class="phead"><h2 id="log-title">Change log</h2><button id="log-close" aria-label="Close">&times;</button></div>
     <div class="tabs"><button class="on" data-tab="updates">Updates</button><button data-tab="credits">Credits</button></div>
     <div class="pbody" id="tab-updates">
-      <h3>TSW v2 1.3<span>Backgrounds and polish</span></h3>
+      <h3>TSW v2 1.4<span>Video and more backgrounds</span></h3>
+      <p class="date">October 2026</p>
+      <ul>
+        <li>Video background: use a video from the site or one from your own device.</li>
+        <li>New backgrounds: aurora, rain on glass, city lights, night ocean, and a solid color.</li>
+        <li>Accent color picker, a clock and date, and rotating tips on the homepage.</li>
+        <li>A short loading animation when TSW v2 opens.</li>
+        <li>Server status now keeps a history of recent checks.</li>
+        <li>Games tab now has shortcuts to game sites.</li>
+        <li>Cleaner Credits with links to every project, and a source code link.</li>
+        <li>Faster loading with file compression and caching.</li>
+      </ul>
+      <h3 class="older">TSW v2 1.3<span>Backgrounds and polish</span></h3>
       <p class="date">October 2026</p>
       <ul>
         <li>New interactive ice waves background, chosen in Settings. More backgrounds are coming soon.</li>
@@ -381,12 +459,16 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
     <div class="pbody" id="tab-credits" hidden>
       <h3 class="made">Made by Alex Dalbey</h3>
       <p class="date">Built with</p>
-      <dl>
-        <dt>Scramjet</dt><dd>The web proxy engine, by Mercury Workshop (MIT license).</dd>
-        <dt>Scramjet-App</dt><dd>The server this site is built on, by Mercury Workshop (AGPL-3.0 license).</dd>
-        <dt>libcurl-transport, bare-mux and wisp-js</dt><dd>The connection layer that carries proxied traffic, by Mercury Workshop.</dd>
-        <dt>Fastify</dt><dd>The web server framework.</dd>
-      </dl>
+      <ul class="credits">
+        <li><a href="https://github.com/MercuryWorkshop/scramjet" target="_blank" rel="noopener noreferrer">Scramjet</a><span>The web proxy engine, by Mercury Workshop. MIT license.</span></li>
+        <li><a href="https://github.com/MercuryWorkshop/Scramjet-App" target="_blank" rel="noopener noreferrer">Scramjet-App</a><span>The server this site is built on, by Mercury Workshop. AGPL-3.0 license.</span></li>
+        <li><a href="https://github.com/MercuryWorkshop/libcurl-transport" target="_blank" rel="noopener noreferrer">libcurl-transport</a><span>Carries proxied traffic, by Mercury Workshop.</span></li>
+        <li><a href="https://www.npmjs.com/package/@mercuryworkshop/bare-mux" target="_blank" rel="noopener noreferrer">bare-mux</a><span>Connects the proxy to its transport, by Mercury Workshop.</span></li>
+        <li><a href="https://www.npmjs.com/package/@mercuryworkshop/wisp-js" target="_blank" rel="noopener noreferrer">wisp-js</a><span>The proxy's WebSocket server, by Mercury Workshop.</span></li>
+        <li><a href="https://fastify.dev" target="_blank" rel="noopener noreferrer">Fastify</a><span>The web server framework.</span></li>
+      </ul>
+      <h4 class="subh">Source code</h4>
+      <p class="hint" style="font-size:.88rem">Because TSW v2 is built on Scramjet-App (AGPL-3.0), its source code is public. <a class="plain-link" href="https://github.com/badpuppet0/Scramjet-App" target="_blank" rel="noopener noreferrer">View the source code on GitHub</a>.</p>
     </div>
   </div>
 </div>
@@ -394,7 +476,8 @@ html, body { height: 100%; background: var(--void); color: var(--ink); overflow:
 <main id="home">
   <div class="hero">
     <h1 class="mark">TSW<b>v2</b></h1>
-    <p class="tag">Type a website or a search.</p>
+    <p class="clock" id="clock"></p>
+    <p class="tag" id="tip">Type a website or a search.</p>
     <form class="field" id="home-form" autocomplete="off">
       <input id="home-input" type="text" inputmode="url" autocapitalize="off" spellcheck="false"
              placeholder="Search or enter a web address" aria-label="Search or enter a web address">
@@ -448,17 +531,23 @@ var store = {
   set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
   del: function (k) { try { localStorage.removeItem(k); } catch (e) {} }
 };
-/* ===================== background: stars / ice waves, seasons, rockets ===================== */
+/* ===================== backgrounds, seasons, rockets ===================== */
 (function () {
   var c = $('sky'), g = c.getContext('2d');
-  var stars = [], shots = [], puffs = [], shines = [], flakes = [], bats = [], ripples = [];
-  var w = 0, h = 0, dpr = 1, next = 0, nextShine = 1500, lastRipple = 0, lastX = 0, lastY = 0, seeded = '';
+  var stars = [], shots = [], puffs = [], shines = [], flakes = [], bats = [], ripples = [], drops = [], bokeh = [], layers = [];
+  var w = 0, h = 0, dpr = 1, next = 0, nextShine = 1500, lastRipple = 0, lastX = 0, lastY = 0, seeded = '', bgSeeded = '';
   var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var COLORS = ['#ffffff', '#ffffff', '#ffffff', '#ffffff', '#eef4ff'];
+  var BGS = ['stars', 'ice', 'aurora', 'rain', 'city', 'ocean', 'solid', 'video'];
+  var GRADS = {
+    ice: [[0, '#020711'], [1, '#07203a']], aurora: [[0, '#01040a'], [1, '#06102a']], rain: [[0, '#0a111e'], [1, '#162033']],
+    city: [[0, '#05060f'], [.65, '#1b1236'], [1, '#4a2250']], ocean: [[0, '#03060f'], [.55, '#0b1834'], [.5501, '#08162c'], [1, '#020711']]
+  };
 
   function opt() {
-    var o = window.TSWSky || {};
-    return { stars: o.stars !== false, shoot: o.shoot !== false, bg: o.bg === 'ice' ? 'ice' : 'stars', season: o.season || 'auto' };
+    var o = window.TSWSky || {}, bg = BGS.indexOf(o.bg) >= 0 ? o.bg : 'stars';
+    if (bg === 'video' && !window.TSWVideoOk) bg = 'stars';   /* stars until the video is really playing */
+    return { stars: o.stars !== false, shoot: o.shoot !== false, bg: bg, season: o.season || 'auto', solid: o.solid || '#0a0f1c', accent: o.accent || '#5aa2ff' };
   }
   function seasonOf(o) {
     if (o.season === 'off') return '';
@@ -481,7 +570,7 @@ var store = {
         a: Math.random() * .35 + .65, s: Math.random() * 2 + .6, p: Math.random() * 6.28,
         c: COLORS[Math.floor(Math.random() * COLORS.length)] });
     }
-    seeded = '';
+    seeded = ''; bgSeeded = '';
   }
   function seed(kind) {
     var i;
@@ -495,6 +584,24 @@ var store = {
         vx: (Math.random() < .5 ? -1 : 1) * (.7 + Math.random() * 1.1), p: Math.random() * 6.28, sc: .9 + Math.random() * .8, d: Math.random() * 6.28 });
     }
   }
+  function newDrop(initial) { return { x: Math.random() * w, y: initial ? Math.random() * h : -10, r: 1.5 + Math.random() * 3.5, hold: Math.random() * 300, trail: 0 }; }
+  function seedBg(bg) {
+    var i;
+    if (bg === 'rain') {
+      drops = []; for (i = 0; i < Math.round(w * h / 14000); i++) drops.push(newDrop(true));
+      var BC = ['255,200,120', '255,140,170', '140,210,255', '200,170,255'];
+      bokeh = []; for (i = 0; i < 14; i++) bokeh.push({ x: Math.random() * w, y: Math.random() * h * .85, r: 30 + Math.random() * 60,
+        c: BC[Math.floor(Math.random() * BC.length)], a: .05 + Math.random() * .07, p: Math.random() * 6.28 });
+    } else if (bg === 'city') {
+      layers = [];
+      [{ sp: .15, min: 40, max: 90, a: .12, b: .3, col: '#0b0a1c', win: 0 }, { sp: .3, min: 50, max: 110, a: .16, b: .4, col: '#0e0c24', win: .5 },
+       { sp: .6, min: 60, max: 130, a: .2, b: .52, col: '#120f2c', win: 1 }].forEach(function (sp) {
+        var bs = [], x = 0;
+        while (x < w * 1.5 + 200) { var bw = sp.min + Math.random() * (sp.max - sp.min); bs.push({ x: x, w: bw, h: h * (sp.a + Math.random() * (sp.b - sp.a)), seed: Math.random() }); x += bw + Math.random() * 6; }
+        layers.push({ sp: sp.sp, b: bs, total: x, col: sp.col, win: sp.win, off: Math.random() * 400 });
+      });
+    }
+  }
   function spawn() {
     var fromLeft = Math.random() < .5;
     if (Math.random() < .2) {   /* 1 in 5 is a tiny rocket */
@@ -506,7 +613,7 @@ var store = {
         vx: (fromLeft ? 1 : -1) * (6 + Math.random() * 4), vy: 2.4 + Math.random() * 2, life: 0, max: 55 + Math.random() * 25 });
     }
   }
-  function drawRocket(o) {
+  function drawRocket(o, accent) {
     var ang = Math.atan2(o.vy, o.vx), ux = Math.cos(ang), uy = Math.sin(ang);
     var x0 = o.x - ux * 9, y0 = o.y - uy * 9;
     var gr = g.createLinearGradient(x0, y0, o.x - ux * 85, o.y - uy * 85);
@@ -526,7 +633,7 @@ var store = {
     g.beginPath(); g.moveTo(-6, 3); g.lineTo(-10, 7); g.lineTo(-2, 3); g.closePath(); g.fill();
     g.fillStyle = '#eef3ff'; g.beginPath(); g.moveTo(-7, -3); g.lineTo(3, -3);
     g.quadraticCurveTo(10, -2.5, 11.5, 0); g.quadraticCurveTo(10, 2.5, 3, 3); g.lineTo(-7, 3); g.closePath(); g.fill();
-    g.fillStyle = '#5aa2ff'; g.beginPath(); g.arc(1.5, 0, 1.7, 0, 6.2832); g.fill();
+    g.fillStyle = accent; g.beginPath(); g.arc(1.5, 0, 1.7, 0, 6.2832); g.fill();
     g.restore();
   }
   function drawBat(b, t) {
@@ -542,11 +649,25 @@ var store = {
     g.beginPath(); g.moveTo(-2, -4); g.lineTo(-1, -8); g.lineTo(0, -4); g.moveTo(0, -4); g.lineTo(1, -8); g.lineTo(2, -4); g.fill();
     g.restore();
   }
-  /* Icy, wavy layers that bend where you move the pointer. */
-  function drawIce(t) {
-    var bg = g.createLinearGradient(0, 0, 0, h); bg.addColorStop(0, '#020711'); bg.addColorStop(1, '#07203a');
-    g.globalAlpha = 1; g.fillStyle = bg; g.fillRect(0, 0, w, h);
+
+  /* ---- base fill (behind the stars) ---- */
+  function drawBase(o) {
+    g.globalAlpha = 1;
+    if (GRADS[o.bg]) {
+      var gr = g.createLinearGradient(0, 0, 0, h);
+      GRADS[o.bg].forEach(function (st) { gr.addColorStop(st[0], st[1]); });
+      g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    } else if (o.bg === 'solid') { g.fillStyle = o.solid; g.fillRect(0, 0, w, h); }
   }
+  function showStar(bg, s, i) {
+    if (bg === 'rain' || bg === 'video') return false;
+    if (bg === 'ice') return i % 3 === 0 && s.y < h * .55;
+    if (bg === 'city') return s.y < h * .5;
+    if (bg === 'ocean') return s.y < h * .52;
+    return true;
+  }
+
+  /* ---- ice: wavy layers that bend where you move the pointer ---- */
   function drawWaves(t) {
     var tt = still ? 0 : t, i, k, x, pts, y, rp, d, env, wgt;
     for (k = ripples.length - 1; k >= 0; k--) { ripples[k].age++; if (ripples[k].age > 140) ripples.splice(k, 1); }
@@ -574,21 +695,119 @@ var store = {
       g.stroke();
     }
   }
+
+  /* ---- aurora: soft moving green and violet light bands ---- */
+  function drawAurora(t) {
+    var tt = still ? 0 : t, prev = g.globalCompositeOperation;
+    g.globalCompositeOperation = 'lighter';
+    [{ c: '60,255,170', y: .36, a: .20, s: .00022, p: 0 }, { c: '90,230,200', y: .46, a: .15, s: .00031, p: 2 },
+     { c: '160,110,255', y: .40, a: .17, s: .00026, p: 4 }, { c: '120,255,160', y: .52, a: .12, s: .00019, p: 1 }].forEach(function (b) {
+      for (var x = 0; x <= w; x += 8) {
+        var n = Math.sin(x * .004 + tt * b.s * 6 + b.p) * .5 + Math.sin(x * .0095 - tt * b.s * 4 + b.p * 2) * .3 + Math.sin(x * .0021 + tt * b.s * 2) * .2;
+        var rim = h * b.y + n * h * .10, ht = h * (.20 + .10 * Math.sin(x * .006 + tt * b.s * 5 + b.p * 3));
+        var gr = g.createLinearGradient(0, rim - ht, 0, rim);
+        gr.addColorStop(0, 'rgba(' + b.c + ',0)'); gr.addColorStop(.85, 'rgba(' + b.c + ',' + b.a + ')'); gr.addColorStop(1, 'rgba(' + b.c + ',' + (b.a * 1.5) + ')');
+        g.fillStyle = gr; g.fillRect(x, rim - ht, 9, ht);
+      }
+    });
+    g.globalCompositeOperation = prev;
+  }
+
+  /* ---- rain on glass: soft lights behind sliding drops ---- */
+  function drawRain(t) {
+    var i, d;
+    for (i = 0; i < bokeh.length; i++) {
+      var b = bokeh[i]; g.globalAlpha = b.a * (.8 + .2 * Math.sin(t / 1500 + b.p)); g.fillStyle = 'rgb(' + b.c + ')';
+      g.beginPath(); g.arc(b.x, b.y, b.r, 0, 6.2832); g.fill();
+    }
+    for (i = 0; i < drops.length; i++) {
+      d = drops[i];
+      if (!still) {
+        if (d.hold > 0) d.hold--;
+        else { var vy = .6 + Math.random() * 1.4; d.y += vy; d.trail = Math.min(d.trail + vy, 60); if (Math.random() < .02) d.hold = 120 + Math.random() * 400; }
+        d.trail *= .997;
+      }
+      if (d.y > h + 20) { drops[i] = newDrop(false); continue; }
+      if (d.trail > 2) {
+        var tg = g.createLinearGradient(d.x, d.y, d.x, d.y - d.trail);
+        tg.addColorStop(0, 'rgba(190,215,255,.16)'); tg.addColorStop(1, 'rgba(190,215,255,0)');
+        g.globalAlpha = 1; g.strokeStyle = tg; g.lineWidth = d.r * .6; g.lineCap = 'round';
+        g.beginPath(); g.moveTo(d.x, d.y); g.lineTo(d.x, d.y - d.trail); g.stroke();
+      }
+      g.globalAlpha = .2; g.fillStyle = 'rgb(185,210,255)'; g.beginPath(); g.arc(d.x, d.y, d.r, 0, 6.2832); g.fill();
+      g.globalAlpha = .4; g.fillStyle = '#ffffff'; g.beginPath(); g.arc(d.x - d.r * .3, d.y - d.r * .3, d.r * .35, 0, 6.2832); g.fill();
+    }
+  }
+
+  /* ---- city lights: slow drifting skyline ---- */
+  function rn(n) { return Math.abs(Math.sin(n * 12.9898) * 43758.5453) % 1; }
+  function drawCity(t) {
+    var tt = still ? 0 : t, li, bi, r, c2;
+    for (li = 0; li < layers.length; li++) {
+      var L = layers[li], off = (tt * L.sp * .03 + L.off) % L.total;
+      g.globalAlpha = 1; g.fillStyle = L.col;
+      for (bi = 0; bi < L.b.length; bi++) {
+        var b = L.b[bi], bx = b.x - off; if (bx + b.w < 0) bx += L.total; if (bx > w) continue;
+        var by = h - b.h; g.fillRect(bx, by, b.w, b.h);
+        if (L.win) {
+          var cols = Math.floor(b.w / 9), rows = Math.floor(b.h / 12);
+          g.fillStyle = 'rgba(255,214,120,' + (.75 * L.win) + ')';
+          for (r = 0; r < rows; r++) for (c2 = 0; c2 < cols; c2++) {
+            var k = b.seed * 1000 + r * 31 + c2 * 7, lit = rn(k) > .6;
+            if (rn(k + Math.floor(tt / 6000)) > .93) lit = !lit;
+            if (lit) g.fillRect(bx + 4 + c2 * 9, by + 6 + r * 12, 3, 5);
+          }
+          g.fillStyle = L.col;
+        }
+      }
+    }
+  }
+
+  /* ---- night ocean: calm water with a moon reflection ---- */
+  function drawOcean(t) {
+    var hz = h * .55, tt = still ? 0 : t, i, x, f, y, amp, yy;
+    var mx = w * .7, my = h * .22, mr = Math.min(w, h) * .045;
+    var mg = g.createRadialGradient(mx, my, mr * .5, mx, my, mr * 5);
+    mg.addColorStop(0, 'rgba(220,235,255,.35)'); mg.addColorStop(1, 'rgba(220,235,255,0)');
+    g.globalAlpha = 1; g.fillStyle = mg; g.fillRect(mx - mr * 5, my - mr * 5, mr * 10, mr * 10);
+    g.fillStyle = '#eaf2ff'; g.beginPath(); g.arc(mx, my, mr, 0, 6.2832); g.fill();
+    for (i = 0; i < 22; i++) {
+      f = i / 21; y = hz + Math.pow(f, 1.6) * (h - hz); amp = 1 + f * 7;
+      g.strokeStyle = 'rgba(120,170,230,' + (.05 + f * .12) + ')'; g.lineWidth = 1 + f * 1.2; g.beginPath();
+      for (x = 0; x <= w; x += 10) {
+        yy = y + Math.sin(x * (.012 - f * .006) + tt * .0006 * (1 + f) + i) * amp;
+        if (x === 0) g.moveTo(x, yy); else g.lineTo(x, yy);
+      }
+      g.stroke();
+    }
+    for (i = 0; i < 40; i++) {
+      f = i / 40; y = hz + 4 + f * (h - hz);
+      var hw = (6 + f * 70) * (.4 + .6 * Math.abs(Math.sin(tt * .001 + i * 1.7)));
+      g.fillStyle = 'rgba(220,235,255,' + (.35 - .25 * f) + ')';
+      g.fillRect(mx - hw + Math.sin(tt * .0008 + i) * 6, y, hw * 2, 1.6 + f * 1.5);
+    }
+  }
+
   function frame(t) {
     var o = opt(), se = still ? '' : seasonOf(o), i;
     g.clearRect(0, 0, w, h);
-    if (o.bg === 'ice') drawIce(t);
+    drawBase(o);
     if (se !== seeded) { seeded = se; seed(se); }
+    if (o.bg !== bgSeeded) { bgSeeded = o.bg; seedBg(o.bg); }
     if (o.stars) {
       for (i = 0; i < stars.length; i++) {
         var s = stars[i];
-        if (o.bg === 'ice' && (i % 3 || s.y > h * .55)) continue;
+        if (!showStar(o.bg, s, i)) continue;
         var tw = still ? 1 : .8 + .2 * Math.sin(t / 1000 * s.s + s.p);
         g.globalAlpha = s.a * tw; g.fillStyle = s.c;
         g.beginPath(); g.arc(s.x, s.y, s.r, 0, 6.2832); g.fill();
       }
     }
     if (o.bg === 'ice') drawWaves(t);
+    else if (o.bg === 'aurora') drawAurora(t);
+    else if (o.bg === 'rain') drawRain(t);
+    else if (o.bg === 'city') drawCity(t);
+    else if (o.bg === 'ocean') drawOcean(t);
     if (se === 'snow') {
       for (i = 0; i < flakes.length; i++) {
         var fk = flakes[i]; fk.y += fk.vy; fk.x += Math.sin(t / 1000 * fk.s + fk.p) * .4;
@@ -603,9 +822,10 @@ var store = {
         drawBat(bt, t);
       }
     }
-    if (o.stars && !still) {
+    if (o.stars && !still && showStar(o.bg, { y: 0 }, 0)) {
       if (t > nextShine && stars.length) {   /* once in a while one star shines */
-        shines.push({ s: stars[Math.floor(Math.random() * stars.length)], life: 0, max: 50 });
+        var cand = stars[Math.floor(Math.random() * stars.length)];
+        if (showStar(o.bg, cand, 0)) shines.push({ s: cand, life: 0, max: 50 });
         nextShine = t + 1800 + Math.random() * 3200;
       }
     }
@@ -639,7 +859,7 @@ var store = {
           if (q.life > q.max || q.y < -40 || q.y > h + 40) { shots.splice(j, 1); continue; }
           if (q.life % 2 === 0) puffs.push({ x: q.x - q.vx * 3 + (Math.random() - .5) * 3, y: q.y - q.vy * 3 + (Math.random() - .5) * 3,
             r: 1.4 + Math.random() * 1.5, life: 0, max: 34 });
-          drawRocket(q);
+          drawRocket(q, o.accent);
           continue;
         }
         var f = 1 - q.life / q.max;
@@ -661,8 +881,9 @@ var store = {
     if (still || !$('browse').hidden || interactive(ev.target)) return;
     var o = opt();
     if (o.bg === 'ice') { ripples.push({ x: ev.clientX, y: ev.clientY, a: 42, age: 0 }); if (ripples.length > 14) ripples.shift(); return; }
-    var best = null, bd = 1600, i;   /* nearest star within 40px */
+    var best = null, bd = 1600, i;   /* nearest visible star within 40px */
     for (i = 0; i < stars.length; i++) {
+      if (!showStar(o.bg, stars[i], i)) continue;
       var dx = stars[i].x - ev.clientX, dy = stars[i].y - ev.clientY, dist = dx * dx + dy * dy;
       if (dist < bd) { bd = dist; best = stars[i]; }
     }
@@ -679,6 +900,100 @@ var store = {
   }, { passive: true });
   addEventListener('resize', size);
   size(); requestAnimationFrame(frame);
+})();
+
+/* ===================== video background ===================== */
+(function () {
+  var v = $('bgvid'), cur = '', objUrl = '', DB = 'tsw', STORE = 'files', KEY = 'bgvideo';
+  var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function db() {
+    return new Promise(function (res, rej) {
+      var r; try { r = indexedDB.open(DB, 1); } catch (e) { return rej(e); }
+      r.onupgradeneeded = function () { r.result.createObjectStore(STORE); };
+      r.onsuccess = function () { res(r.result); }; r.onerror = function () { rej(r.error); };
+    });
+  }
+  function tx(mode, fn) {
+    return db().then(function (d) {
+      return new Promise(function (res, rej) {
+        var t = d.transaction(STORE, mode), q = fn(t.objectStore(STORE));
+        t.oncomplete = function () { res(q && q.result); }; t.onerror = t.onabort = function () { rej(t.error); };
+      });
+    });
+  }
+  function note(msg) { var n = $('vid-note'); if (n) n.textContent = msg || ''; }
+  function off(msg) {
+    v.pause(); v.hidden = true; v.removeAttribute('src'); v.innerHTML = '';
+    try { v.load(); } catch (e) {}
+    if (objUrl) { URL.revokeObjectURL(objUrl); objUrl = ''; }
+    cur = ''; window.TSWVideoOk = false; note(msg);
+  }
+  function play() { var p = v.play(); if (p && p.catch) p.catch(function () { off('Your browser blocked the video from playing on its own.'); }); }
+  function sync() {
+    var o = window.TSWSky || {};
+    if (o.bg !== 'video') { if (cur) off(''); else note(''); return; }
+    if (still) { off('Video is off because your device asks for reduced motion.'); return; }
+    v.style.filter = 'brightness(' + ((o.vbright || 60) / 100) + ')';
+    var key = o.vsrc === 'mine' ? 'mine' : 'site';
+    if (key === cur) return;
+    off(''); cur = key; v.muted = true;
+    if (key === 'mine') {
+      tx('readonly', function (s) { return s.get(KEY); }).then(function (b) {
+        if (cur !== 'mine') return;
+        if (!b) { off('No video saved on this device yet. Choose one with the button above.'); return; }
+        objUrl = URL.createObjectURL(b); v.src = objUrl; v.load(); play();
+      }, function () { off('Your browser would not let TSW v2 use saved videos here.'); });
+    } else {
+      v.innerHTML = '<source src="/bg-video.mp4" type="video/mp4"><source src="/bg-video.webm" type="video/webm">';
+      v.lastChild.onerror = function () { if (cur === 'site') off('No site video has been added yet.'); };
+      v.load(); play();
+    }
+  }
+  v.addEventListener('playing', function () { v.hidden = false; window.TSWVideoOk = true; note(''); });
+  window.TSWVideoSync = sync;
+  window.TSWVideo = {
+    save: function (f) { return tx('readwrite', function (s) { return s.put(f, KEY); }); },
+    remove: function () { return tx('readwrite', function (s) { return s['delete'](KEY); }); },
+    reset: function () { off(''); sync(); }
+  };
+})();
+
+/* ===================== clock and tips ===================== */
+(function () {
+  var clk = $('clock'), tip = $('tip'), ti = 0;
+  var TIPS = ['Type a website or a search.', 'Tip: click a star to make it shine.', 'Tip: add your own shortcuts with the + button.',
+    'Tip: click the server status to see ping and uptime.', 'Tip: pick a new background in Settings.',
+    'Tip: Open in new tab keeps your site open while you start another.', 'Tip: some sites block proxies. Use Report a broken site to tell us.',
+    'Tip: change the accent color in Settings.', 'Tip: you can install TSW v2 as an app from your browser menu.'];
+  function paint() {
+    var mode = window.TSWClock || '12';
+    if (mode === 'off') { clk.hidden = true; return; }
+    clk.hidden = false;
+    var d = new Date();
+    clk.textContent = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: mode === '12' }) + '  \u00b7  ' +
+      d.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+  }
+  window.TSWClockRefresh = paint;
+  setInterval(paint, 10000); paint();
+  setInterval(function () {
+    tip.style.opacity = 0;
+    setTimeout(function () { ti = (ti + 1) % TIPS.length; tip.textContent = TIPS[ti]; tip.style.opacity = 1; }, 400);
+  }, 6500);
+})();
+
+/* ===================== opening animation ===================== */
+(function () {
+  var sp = $('splash'); if (!sp) return;
+  var seen = false; try { seen = sessionStorage.getItem('tsw.splash') === '1'; } catch (e) {}
+  if (seen || matchMedia('(prefers-reduced-motion: reduce)').matches) { sp.remove(); return; }
+  try { sessionStorage.setItem('tsw.splash', '1'); } catch (e) {}
+  var t0 = Date.now(), done = false;
+  function hide() {
+    if (done) return; done = true;
+    setTimeout(function () { sp.classList.add('out'); setTimeout(function () { if (sp.parentNode) sp.remove(); }, 650); }, Math.max(0, 900 - (Date.now() - t0)));
+  }
+  if (document.readyState === 'complete') hide(); else addEventListener('load', hide);
+  setTimeout(hide, 5000);
 })();
 
 /* ===================== server status + wake screen ===================== */
@@ -704,12 +1019,40 @@ var STATUS_NOTICE = '';
 
   /* Asks the server for one of its own files, so Render's loading page does not count as "up". */
   function check() {
-    var ctl = new AbortController(), t = setTimeout(function () { ctl.abort(); }, 10000);
+    var ctl = new AbortController(), t = setTimeout(function () { ctl.abort(); }, 10000), t0 = performance.now();
     return fetch('/register-sw.js', { cache: 'no-store', signal: ctl.signal })
       .then(function (r) { return r.ok ? r.text() : Promise.reject(); })
-      .then(function (txt) { clearTimeout(t); return txt.indexOf('registerSW') > -1; })
+      .then(function (txt) { clearTimeout(t); lastMs = Math.round(performance.now() - t0); return txt.indexOf('registerSW') > -1; })
       .catch(function () { clearTimeout(t); return false; });
   }
+  /* ---- history of checks, kept in this browser only ---- */
+  var lastMs = 0, HKEY = 'tsw.hist', lastRec = 0, lastOk = null;
+  function hist() { var l = store.get(HKEY, []); return Array.isArray(l) ? l : []; }
+  function record(ok, ms) {
+    var now = Date.now();
+    if (lastOk === ok && now - lastRec < 240000) return;
+    lastOk = ok; lastRec = now;
+    var l = hist(); l.push({ t: now, ok: ok ? 1 : 0, ms: ms || 0 });
+    if (l.length > 300) l = l.slice(l.length - 300);
+    store.set(HKEY, l); renderHist();
+  }
+  function renderHist() {
+    var bar = $('hist'), sum = $('hist-sum'); if (!bar || !sum) return;
+    var l = hist(), recent = l.filter(function (e) { return e.t >= Date.now() - 86400000; });
+    bar.innerHTML = '';
+    l.slice(-48).forEach(function (e) {
+      var i = document.createElement('i'); i.className = e.ok ? '' : 'bad';
+      i.title = new Date(e.t).toLocaleString() + (e.ok ? ' (' + e.ms + ' ms)' : ' (down)'); bar.appendChild(i);
+    });
+    if (!recent.length) { sum.textContent = 'No checks recorded yet. Checks happen while TSW v2 is open in this browser.'; return; }
+    var ups = recent.filter(function (e) { return e.ok; }), bad = recent.filter(function (e) { return !e.ok; });
+    var avg = ups.length ? Math.round(ups.reduce(function (a, e) { return a + e.ms; }, 0) / ups.length) : 0;
+    sum.textContent = 'Last 24 hours: ' + recent.length + ' checks, ' + Math.round(100 * ups.length / recent.length) + '% up' +
+      (avg ? ', average response ' + avg + ' ms' : '') + '. ' +
+      (bad.length ? 'Last problem: ' + new Date(bad[bad.length - 1].t).toLocaleString() + '.' : 'No problems seen.');
+  }
+  window.TSWRenderHistory = renderHist;
+  window.TSWClearHistory = function () { store.del(HKEY); lastOk = null; renderHist(); };
   function startWake() {
     if (waking) return;
     waking = true; var id = ++wakeId;
@@ -732,7 +1075,7 @@ var STATUS_NOTICE = '';
   wakeX.addEventListener('click', function () { waking = false; wakeId++; wake.hidden = true; });
   function ping() {
     lastPing = Date.now();
-    check().then(function (ok) { pingOk = ok; paint(); if (!ok) startWake(); });
+    check().then(function (ok) { pingOk = ok; paint(); record(ok, lastMs); if (!ok) startWake(); });
   }
   /* Only ping while the tab is open, visible and recently used, so an old forgotten tab
      does not keep the free server awake and use up its monthly hours. */
@@ -790,10 +1133,11 @@ var STATUS_NOTICE = '';
       return wispPing();
     }).then(function (ms) { $('i-ping').textContent = fmt(ms); busy = false; });
   }
-  function show() { ov.hidden = false; measure(); }
+  function show() { ov.hidden = false; measure(); if (window.TSWRenderHistory) window.TSWRenderHistory(); }
   pill.addEventListener('click', show);
   pill.addEventListener('keydown', function (ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); show(); } });
   $('i-refresh').addEventListener('click', measure);
+  $('i-clear').addEventListener('click', function () { if (window.TSWClearHistory) window.TSWClearHistory(); });
 })();
 
 /* ===================== change log panel ===================== */
@@ -819,42 +1163,86 @@ var STATUS_NOTICE = '';
   var ov = $('settings');
   var ENGINES = { ddg: 'https://duckduckgo.com/?q=', google: 'https://www.google.com/search?q=', bing: 'https://www.bing.com/search?q=',
                   brave: 'https://search.brave.com/search?q=', startpage: 'https://www.startpage.com/sp/search?query=' };
+  var ACCENTS = { blue: '#5aa2ff', green: '#46d38a', pink: '#ff6fb1', orange: '#ff9a4d', violet: '#a78bfa' };
+  var BGS = ['stars', 'ice', 'aurora', 'rain', 'city', 'ocean', 'solid', 'video'];
   var ICONS = {
     "default": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2305070f'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%235aa2ff'/%3E%3C/svg%3E",
     doc: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M8 3h11l6 6v20H8z' fill='%23dfe5f0'/%3E%3Cpath d='M19 3v6h6z' fill='%23aab4c9'/%3E%3C/svg%3E",
     globe: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='%235aa2ff' stroke-width='2.5'/%3E%3Cpath d='M4 16h24M16 4c-6 7-6 17 0 24M16 4c6 7 6 17 0 24' fill='none' stroke='%235aa2ff' stroke-width='2'/%3E%3C/svg%3E",
     blank: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E"
   };
-  var D = { engine: 'ddg', stars: true, shoot: true, title: '', icon: 'default', bg: 'stars', season: 'auto' };
+  var D = { engine: 'ddg', stars: true, shoot: true, title: '', icon: 'default', bg: 'stars', season: 'auto', solid: '#0a0f1c',
+            vsrc: 'site', vbright: 60, accent: 'blue', clock: '12' };
   var cfg = {};
   Object.keys(D).forEach(function (k) { cfg[k] = store.get('tsw.' + k, D[k]); });
   if (!ENGINES[cfg.engine]) cfg.engine = 'ddg';
   if (!ICONS[cfg.icon]) cfg.icon = 'default';
-  if (cfg.bg !== 'ice') cfg.bg = 'stars';
+  if (BGS.indexOf(cfg.bg) < 0) cfg.bg = 'stars';
   if (['auto', 'snow', 'bats', 'off'].indexOf(cfg.season) < 0) cfg.season = 'auto';
+  if (!ACCENTS[cfg.accent]) cfg.accent = 'blue';
+  if (['12', '24', 'off'].indexOf(cfg.clock) < 0) cfg.clock = '12';
+  if (cfg.vsrc !== 'mine') cfg.vsrc = 'site';
+  cfg.vbright = Math.max(20, Math.min(100, parseInt(cfg.vbright, 10) || 60));
+  if (!/^#[0-9a-fA-F]{6}$/.test(cfg.solid)) cfg.solid = D.solid;
 
+  function mix(a, b, t) {
+    function p(hx) { return [1, 3, 5].map(function (i) { return parseInt(hx.substr(i, 2), 16); }); }
+    var x = p(a), y = p(b);
+    return '#' + x.map(function (v, i) { var n = Math.round(v + (y[i] - v) * t); return (n < 16 ? '0' : '') + n.toString(16); }).join('');
+  }
   function apply() {
-    window.TSWSky = { stars: !!cfg.stars, shoot: !!cfg.shoot, bg: cfg.bg, season: cfg.season };
+    var c = ACCENTS[cfg.accent], root = document.documentElement.style;
+    root.setProperty('--blue', c); root.setProperty('--blue-dim', mix(c, '#000000', .45)); root.setProperty('--blue-hi', mix(c, '#ffffff', .25));
+    window.TSWSky = { stars: !!cfg.stars, shoot: !!cfg.shoot, bg: cfg.bg, season: cfg.season, solid: cfg.solid,
+                      vsrc: cfg.vsrc, vbright: cfg.vbright, accent: c };
     window.TSWSearch = function () { return ENGINES[cfg.engine]; };
+    window.TSWClock = cfg.clock; if (window.TSWClockRefresh) window.TSWClockRefresh();
     document.title = cfg.title || 'TSW v2';
     $('fav').href = ICONS[cfg.icon];
+    if (window.TSWVideoSync) window.TSWVideoSync();
   }
   function put(k, v) { cfg[k] = v; store.set('tsw.' + k, v); apply(); }
   function fill() {
     $('set-engine').value = cfg.engine; $('set-bg').value = cfg.bg; $('set-season').value = cfg.season;
     $('set-stars').checked = !!cfg.stars; $('set-shoot').checked = !!cfg.shoot;
-    $('set-title').value = cfg.title; $('set-icon').value = cfg.icon;
+    $('set-title').value = cfg.title; $('set-icon').value = cfg.icon; $('set-solid').value = cfg.solid;
+    $('set-vsrc').value = cfg.vsrc; $('set-vbright').value = cfg.vbright; $('set-accent').value = cfg.accent; $('set-clock').value = cfg.clock;
   }
   $('set-engine').addEventListener('change', function () { put('engine', this.value); });
   $('set-bg').addEventListener('change', function () { put('bg', this.value); });
+  $('set-solid').addEventListener('input', function () { put('solid', this.value); });
+  $('set-vsrc').addEventListener('change', function () { put('vsrc', this.value); });
+  $('set-vbright').addEventListener('input', function () { put('vbright', parseInt(this.value, 10)); });
+  $('set-accent').addEventListener('change', function () { put('accent', this.value); });
+  $('set-clock').addEventListener('change', function () { put('clock', this.value); });
   $('set-season').addEventListener('change', function () { put('season', this.value); });
   $('set-stars').addEventListener('change', function () { put('stars', this.checked); });
   $('set-shoot').addEventListener('change', function () { put('shoot', this.checked); });
   $('set-title').addEventListener('input', function () { put('title', this.value.trim()); });
   $('set-icon').addEventListener('change', function () { put('icon', this.value); });
+
+  /* the user's own video, saved on this device */
+  $('vid-file').addEventListener('change', function () {
+    var f = this.files && this.files[0]; this.value = '';
+    var note = $('vid-note');
+    if (!f) return;
+    if (!/^video\//.test(f.type)) { note.textContent = 'That file is not a video.'; return; }
+    if (f.size > 300 * 1024 * 1024) { note.textContent = 'That video is over 300 MB. Pick a shorter or smaller one.'; return; }
+    note.textContent = 'Saving ' + f.name + '...';
+    window.TSWVideo.save(f).then(function () {
+      cfg.vsrc = 'mine'; cfg.bg = 'video'; store.set('tsw.vsrc', 'mine'); store.set('tsw.bg', 'video');
+      fill(); apply(); window.TSWVideo.reset();
+      note.textContent = 'Saved ' + f.name + ' (' + (f.size / 1048576).toFixed(1) + ' MB).';
+    }, function () { note.textContent = 'Your browser would not let TSW v2 save the video here.'; });
+  });
+  $('vid-remove').addEventListener('click', function () {
+    window.TSWVideo.remove().then(function () { $('vid-note').textContent = 'Your saved video was removed.'; window.TSWVideo.reset(); },
+      function () { $('vid-note').textContent = 'Could not remove it.'; });
+  });
+
   $('set-reset').addEventListener('click', function () {
     Object.keys(D).forEach(function (k) { store.del('tsw.' + k); cfg[k] = D[k]; });
-    fill(); apply();
+    fill(); apply(); window.TSWVideo.reset();
   });
   $('cog').addEventListener('click', function () { fill(); ov.hidden = false; $('set-engine').focus(); });
 
@@ -872,6 +1260,10 @@ var STATUS_NOTICE = '';
 
 /* shared behaviour for the settings and add-shortcut panels */
 $('gamesbtn').addEventListener('click', function () { $('games').hidden = false; });
+$('games').addEventListener('click', function (ev) {
+  var b = ev.target.closest('[data-site]'); if (!b) return;
+  $('games').hidden = true; if (window.TSWOpen) window.TSWOpen(b.getAttribute('data-site'));
+});
 ['settings', 'addlink', 'games', 'info'].forEach(function (id) {
   var el = $(id);
   el.addEventListener('click', function (ev) { if (ev.target === el || ev.target.closest('[data-close]')) el.hidden = true; });
@@ -1088,6 +1480,7 @@ document.addEventListener('keydown', function (ev) {
     try { history.replaceState(null, '', location.pathname); } catch (e) {}
     if (online()) open(goParam); else down();
   }
+  window.TSWOpen = function (u) { if (!online()) { down(); return; } open(u); };
 })();
 </script>
 </body>
