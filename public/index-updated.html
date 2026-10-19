@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TSW v2</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#020308">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="icon" id="fav" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2305070f'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%235aa2ff'/%3E%3C/svg%3E">
+<style>
+:root {
+  --void: #020308;
+  --panel: #0b0e17;
+  --edge: #1b2130;
+  --steel: #6b7488;
+  --ink: #d5dcec;
+  --blue: #5aa2ff;
+  --blue-dim: #2a4f86;
+  --blue-hi: #7cb5ff;
+  --bar: 3.25rem;
+}
+* { box-sizing: border-box; margin: 0; }
+html, body { height: 100%; background: var(--void); color: var(--ink); overflow: hidden;
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+#sky { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; }
+
+/* ---------- home ---------- */
+#home { position: relative; z-index: 1; height: 100%; display: grid; place-items: center;
+  padding: 1.5rem; padding-bottom: 12vh; }
+#home[hidden] { display: none; }
+.hero { width: min(34rem, 100%); text-align: center; }
+.mark { font-size: clamp(2.6rem, 9vw, 4.2rem); font-weight: 200; letter-spacing: .32em;
+  padding-left: .32em; color: var(--ink); }
+.mark b { font-weight: 600; color: var(--blue); letter-spacing: .1em; margin-left: .35em; font-size: .55em; }
+.tag { color: var(--steel); margin: .4rem 0 2rem; font-size: .95rem; }
+.field { display: flex; align-items: center; gap: .5rem; background: rgba(11,14,23,.82);
+  border: 1px solid var(--edge); border-radius: 999px; padding: .35rem .4rem .35rem 1.1rem;
+  transition: border-color .2s, box-shadow .2s; backdrop-filter: blur(6px); }
+.field:focus-within { border-color: var(--blue-dim); box-shadow: 0 0 0 4px rgba(90,162,255,.08); }
+.field input { flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: var(--ink);
+  font: inherit; padding: .55rem 0; }
+.field input::placeholder { color: var(--steel); }
+.go { background: var(--blue); color: #03101f; border: 0; border-radius: 999px; width: 2.5rem; height: 2.5rem;
+  display: grid; place-items: center; cursor: pointer; flex: none; }
+.go:hover { background: var(--blue-hi); }
+.go svg { width: 1.1rem; height: 1.1rem; }
+.msg { min-height: 1.5rem; margin-top: 1rem; color: #e59a9a; font-size: .9rem; }
+.note { position: fixed; left: 0; right: 0; bottom: max(.9rem, env(safe-area-inset-bottom)); text-align: center;
+  color: #454d60; font-size: .8rem; z-index: 1; padding: 0 1rem; }
+
+.links { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem; margin-top: 1.2rem; }
+.links > button, .chip { background: rgba(11,14,23,.82); border: 1px solid var(--edge); color: var(--ink); font: inherit;
+  font-size: .9rem; border-radius: 999px; cursor: pointer; backdrop-filter: blur(6px); transition: border-color .2s, color .2s; }
+.links > button { padding: .5rem 1.05rem; }
+.links > button:hover, .chip:hover { border-color: var(--blue-dim); color: #fff; }
+.chip { display: inline-flex; align-items: center; cursor: default; }
+.chip button { background: none; border: 0; color: inherit; font: inherit; cursor: pointer; padding: .5rem .35rem .5rem 1.05rem; }
+.chip .x { padding: .5rem .75rem .5rem .3rem; color: var(--steel); font-size: 1rem; line-height: 1; }
+.chip .x:hover { color: #ef8f8f; }
+#add-link { color: var(--steel); padding: .5rem .95rem; }
+.links.off > button:not(#add-link), .links.off .chip { opacity: .55; }
+.links.off .chip button:first-child, .links.off > button:not(#add-link) { cursor: not-allowed; }
+.field.off { opacity: .55; cursor: not-allowed; }
+.field.off input { cursor: not-allowed; }
+.field.off .go { background: #3a4152; color: #8a93a6; cursor: not-allowed; }
+.shake { animation: shake .45s; }
+@keyframes shake { 10%,90% { transform: translateX(-2px); } 20%,80% { transform: translateX(4px); }
+  30%,50%,70% { transform: translateX(-7px); } 40%,60% { transform: translateX(7px); } }
+.msg { display: inline-block; }
+.cog { position: fixed; top: max(.9rem, env(safe-area-inset-top)); right: .9rem; z-index: 3; width: 2.5rem; height: 2.5rem;
+  display: grid; place-items: center; background: rgba(11,14,23,.6); border: 1px solid var(--edge);
+  color: var(--steel); border-radius: 50%; cursor: pointer; backdrop-filter: blur(6px); }
+.cog:hover { color: var(--ink); border-color: var(--blue-dim); }
+.cog svg { width: 1.2rem; height: 1.2rem; }
+.toast { position: fixed; top: calc(max(.9rem, env(safe-area-inset-top)) + 3.2rem); right: .9rem; z-index: 3;
+  background: #1a1018; border: 1px solid #5a2a35; color: #f0b4b4; border-radius: 10px; padding: .55rem .9rem;
+  font-size: .88rem; max-width: calc(100vw - 1.8rem); }
+.toast[hidden] { display: none; }
+
+/* status chip */
+.status { position: fixed; left: max(.9rem, env(safe-area-inset-left)); bottom: max(.9rem, env(safe-area-inset-bottom)); z-index: 3;
+  display: flex; align-items: center; gap: .55rem; max-width: min(22rem, calc(100vw - 1.8rem));
+  background: rgba(11,14,23,.78); border: 1px solid var(--edge); border-radius: 999px; padding: .4rem .85rem .4rem .7rem;
+  color: var(--steel); font-size: .82rem; line-height: 1.25; backdrop-filter: blur(6px); }
+.status svg { width: 1rem; height: 1rem; flex: none; }
+.dot { width: .55rem; height: .55rem; border-radius: 50%; flex: none; background: #6b7488; }
+.status[data-s="up"] .dot { background: #3ddc84; box-shadow: 0 0 0 0 rgba(61,220,132,.5); animation: pulse 2.4s infinite; }
+.status[data-s="warn"] .dot { background: #f5c542; }
+.status[data-s="down"] .dot { background: #ef5350; }
+.status[data-s="up"] { color: #b6c4bd; }
+.status[data-s="warn"] { color: #e6d49a; }
+.status[data-s="down"] { color: #f0b4b4; }
+@keyframes pulse { 70% { box-shadow: 0 0 0 .45rem rgba(61,220,132,0); } 100% { box-shadow: 0 0 0 0 rgba(61,220,132,0); } }
+@media (max-width: 640px) { .note { bottom: 3.4rem; } }
+
+/* change log */
+.cog.log { right: 3.9rem; }
+.overlay { position: fixed; inset: 0; z-index: 5; display: grid; place-items: center; padding: 1rem;
+  background: rgba(0,0,0,.62); backdrop-filter: blur(4px); }
+.overlay[hidden] { display: none; }
+.panel { width: min(32rem, 100%); max-height: min(80vh, 36rem); display: flex; flex-direction: column;
+  background: var(--panel); border: 1px solid var(--edge); border-radius: 16px; overflow: hidden; }
+.phead { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.1rem .6rem; }
+.phead h2 { font-size: 1.05rem; font-weight: 500; }
+.phead button { background: none; border: 0; color: var(--steel); font-size: 1.5rem; line-height: 1; cursor: pointer;
+  width: 2rem; height: 2rem; border-radius: 8px; }
+.phead button:hover { color: var(--ink); background: #151a28; }
+.tabs { display: flex; gap: .3rem; padding: 0 1.1rem; border-bottom: 1px solid var(--edge); }
+.tabs button { background: none; border: 0; border-bottom: 2px solid transparent; color: var(--steel); font: inherit;
+  font-size: .9rem; padding: .5rem .7rem; cursor: pointer; margin-bottom: -1px; }
+.tabs button.on { color: var(--ink); border-bottom-color: var(--blue); }
+.pbody { padding: 1rem 1.1rem 1.2rem; overflow: auto; }
+.pbody[hidden] { display: none; }
+.pbody h3 { font-size: 1rem; font-weight: 600; }
+.pbody h3 span { color: var(--blue); font-weight: 500; margin-left: .4rem; }
+.pbody .date { color: var(--steel); font-size: .8rem; margin: .15rem 0 .7rem; }
+.pbody ul { padding-left: 1.1rem; color: #b8c1d4; font-size: .92rem; }
+.pbody li { margin: .25rem 0; }
+.pbody dl { font-size: .92rem; }
+.pbody dt { font-weight: 500; margin-top: .8rem; }
+.pbody dt:first-child { margin-top: 0; }
+.pbody dd { margin: 0; color: #9aa3b8; }
+
+/* forms, settings, wake screen */
+.f label { display: block; font-size: .85rem; color: var(--steel); margin: .95rem 0 .3rem; }
+.f label:first-child { margin-top: 0; }
+.f input[type=text], .f select { width: 100%; background: var(--void); border: 1px solid var(--edge); color: var(--ink);
+  border-radius: 10px; padding: .55rem .7rem; font: inherit; outline: 0; }
+.f input[type=text]:focus, .f select:focus { border-color: var(--blue-dim); }
+.f .check { display: flex; align-items: center; gap: .6rem; color: var(--ink); font-size: .95rem; margin: .85rem 0 0; }
+.f .check input { accent-color: var(--blue); width: 1.05rem; height: 1.05rem; }
+.hint { color: var(--steel); font-size: .78rem; margin-top: .3rem; }
+.err { color: #e59a9a; font-size: .85rem; min-height: 1.2rem; margin-top: .6rem; }
+.row { display: flex; gap: .6rem; margin-top: 1rem; align-items: center; }
+.plain { background: none; border: 1px solid var(--edge); color: var(--ink); font: inherit; border-radius: 999px;
+  padding: .45rem 1rem; cursor: pointer; margin-top: 1rem; }
+.row .plain { margin-top: 0; }
+.plain:hover { border-color: var(--blue-dim); }
+.primary { background: var(--blue); color: #03101f; border: 0; border-radius: 999px; padding: .5rem 1.2rem; font: inherit; cursor: pointer; }
+.primary:hover { background: var(--blue-hi); }
+.pbody h3.older { margin-top: 1.5rem; }
+.pbody h3.made { font-size: 1.2rem; }
+.wake { z-index: 6; background: rgba(2,3,8,.9); }
+.wakebox { text-align: center; max-width: 24rem; }
+.wakebox h2 { font-weight: 500; font-size: 1.15rem; margin: 1rem 0 .4rem; }
+.wakebox p { color: var(--steel); }
+.spin { width: 2rem; height: 2rem; margin: 0 auto; border: 2px solid var(--edge); border-top-color: var(--blue);
+  border-radius: 50%; animation: spin .9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- browsing ---------- */
+#browse { position: fixed; inset: 0; z-index: 2; display: flex; flex-direction: column; background: var(--void); }
+#browse[hidden] { display: none; }
+.bar { height: var(--bar); flex: none; display: flex; align-items: center; gap: .35rem;
+  padding: 0 .6rem; padding-top: env(safe-area-inset-top); background: var(--panel);
+  border-bottom: 1px solid var(--edge); position: relative; }
+.bar button { background: none; border: 0; color: var(--steel); width: 2.2rem; height: 2.2rem; border-radius: 8px;
+  display: grid; place-items: center; cursor: pointer; flex: none; }
+.bar button:hover:not(:disabled) { color: var(--ink); background: #151a28; }
+.bar button:disabled { opacity: .3; cursor: default; }
+.bar svg { width: 1.15rem; height: 1.15rem; }
+.bar .addr { flex: 1; min-width: 0; background: var(--void); border: 1px solid var(--edge); color: var(--ink);
+  border-radius: 999px; padding: .4rem .9rem; font: inherit; font-size: .92rem; outline: 0; }
+.bar .addr:focus { border-color: var(--blue-dim); }
+.load { position: absolute; left: 0; bottom: -1px; height: 2px; width: 0; background: var(--blue); opacity: 0; }
+.load.on { opacity: 1; animation: load 8s cubic-bezier(.1,.6,.2,1) forwards; }
+@keyframes load { to { width: 92%; } }
+#view { flex: 1; min-height: 0; position: relative; }
+#view iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #fff; }
+.fail { position: absolute; inset: 0; display: grid; place-items: center; padding: 1.5rem; text-align: center; }
+.fail div { max-width: 28rem; }
+.fail h2 { font-weight: 500; font-size: 1.2rem; margin-bottom: .5rem; }
+.fail p { color: var(--steel); }
+.fail button { margin-top: 1.2rem; background: none; border: 1px solid var(--edge); color: var(--ink);
+  border-radius: 999px; padding: .5rem 1.2rem; font: inherit; cursor: pointer; }
+.fail button:hover { border-color: var(--blue-dim); }
+
+@media (max-width: 480px) { #btn-fwd, #btn-newtab { display: none; } }
+@media (prefers-reduced-motion: reduce) { .shake, .status .dot, .spin { animation: none; } .load.on { animation-duration: 0s; width: 92%; } }
+
+/* ---- v1.2 additions ---- */
+.cog { width: 3rem; height: 3rem; }
+.cog svg { width: 1.5rem; height: 1.5rem; }
+.cog.log { right: 4.4rem; }
+.cog.games { right: 7.9rem; }
+.status { cursor: pointer; }
+.status:hover, .status:focus-visible { border-color: var(--blue-dim); outline: 0; }
+.subh { margin-top: 1.4rem; font-size: .95rem; font-weight: 600; }
+.soonrow { display: flex; align-items: center; gap: .85rem; padding: .7rem .8rem; margin-top: .6rem;
+  border: 1px solid var(--edge); border-radius: 12px; background: rgba(255,255,255,.015); }
+.soonrow > svg { width: 1.6rem; height: 1.6rem; color: var(--steel); flex: none; fill: none; stroke: currentColor;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.soonrow b { display: block; font-weight: 500; font-size: .92rem; }
+.soonrow small { color: var(--steel); font-size: .78rem; }
+.badge { margin-left: auto; flex: none; font-size: .7rem; color: #9ac4ff; border: 1px solid var(--blue-dim);
+  border-radius: 999px; padding: .12rem .55rem; white-space: nowrap; }
+.pbody .kv { margin: 0; }
+.pbody .kv div { display: flex; justify-content: space-between; gap: 1rem; padding: .65rem 0; border-bottom: 1px solid var(--edge); }
+.pbody .kv dt { color: var(--steel); font-size: .9rem; margin: 0; font-weight: 400; }
+.pbody .kv dd { margin: 0; color: var(--ink); text-align: right; word-break: break-all; font-variant-numeric: tabular-nums; }
+
+/* ---- v1.3 additions ---- */
+.note a { color: #6f84ad; text-decoration: underline; }
+.note a:hover { color: #9ac4ff; }
+.spinning svg { animation: spin .8s linear infinite; }
+.diag { position: absolute; z-index: 4; left: 50%; transform: translateX(-50%);
+  top: calc(var(--bar) + env(safe-area-inset-top, 0px) + .8rem); width: min(30rem, calc(100% - 1.6rem));
+  background: rgba(14,18,30,.97); border: 1px solid #44303a; border-radius: 14px; padding: 1rem 1.1rem;
+  box-shadow: 0 12px 40px rgba(0,0,0,.55); }
+.diag[hidden] { display: none; }
+.diag h3 { font-size: 1rem; font-weight: 600; margin: 0 1.6rem .3rem 0; color: #f0c4c4; }
+.diag.soft { border-color: var(--edge); }
+.diag.soft h3 { color: var(--ink); }
+.diag p { color: #aab3c6; font-size: .9rem; }
+.diag .row { flex-wrap: wrap; gap: .5rem; margin-top: .9rem; }
+.diag .plain, .diag a.plain { display: inline-block; margin-top: 0; font-size: .88rem; padding: .4rem .9rem; text-decoration: none; color: var(--ink); }
+.diag .x { position: absolute; top: .4rem; right: .5rem; background: none; border: 0; color: var(--steel); font-size: 1.5rem;
+  line-height: 1; cursor: pointer; width: 2rem; height: 2rem; }
+.diag .x:hover { color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { .spinning svg { animation: none; } }
+@media (pointer: coarse), (max-width: 640px) {
+  :root { --bar: 3.9rem; }
+  .cog { width: 3.4rem; height: 3.4rem; }
+  .cog svg { width: 1.7rem; height: 1.7rem; }
+  .cog.log { right: 4.8rem; }
+  .cog.games { right: 8.7rem; }
+  .links > button, .chip button { padding-top: .75rem; padding-bottom: .75rem; font-size: 1rem; }
+  .chip .x { padding: .75rem .9rem .75rem .4rem; }
+  #add-link { padding: .75rem 1.2rem; }
+  .field input { font-size: 1rem; padding: .8rem 0; }
+  .field .go { width: 3rem; height: 3rem; }
+  .bar button { width: 2.8rem; height: 2.8rem; }
+  .bar svg { width: 1.3rem; height: 1.3rem; }
+  .bar .addr { font-size: 1rem; padding: .6rem 1rem; }
+  .status { padding: .6rem 1rem .6rem .8rem; font-size: .95rem; }
+  .f select, .f input[type=text] { padding: .8rem; font-size: 1rem; }
+  .f .check input { width: 1.4rem; height: 1.4rem; }
+  .phead button { width: 2.8rem; height: 2.8rem; }
+  .tabs button { padding: .8rem 1rem; }
+  .plain, .primary { padding: .7rem 1.3rem; }
+  .diag .plain, .diag a.plain { padding: .65rem 1.1rem; }
+}
+
+/* ---- v1.4 additions ---- */
+#bgvid { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; pointer-events: none; }
+#bgvid[hidden] { display: none; }
+.clock { color: var(--steel); font-size: 1.05rem; margin: .5rem 0 1.2rem; min-height: 1.6rem; font-variant-numeric: tabular-nums; }
+.clock[hidden] { display: none; }
+.tag { transition: opacity .4s; }
+#splash { position: fixed; inset: 0; z-index: 50; background: var(--void); display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 1.4rem; transition: opacity .6s; animation: spgone .01s 7s forwards; }
+#splash.out { opacity: 0; pointer-events: none; }
+@keyframes spgone { to { opacity: 0; visibility: hidden; pointer-events: none; } }
+.sp-mark { font-size: clamp(2.4rem, 9vw, 4rem); font-weight: 200; letter-spacing: .32em; padding-left: .32em; }
+.sp-mark b { font-weight: 600; color: var(--blue); letter-spacing: .1em; margin-left: .35em; font-size: .55em; }
+.sp-bar { width: 9rem; height: 2px; background: var(--edge); overflow: hidden; border-radius: 2px; }
+.sp-bar i { display: block; height: 100%; width: 40%; background: var(--blue); animation: spbar 1s ease-in-out infinite; }
+@keyframes spbar { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+.hist { display: flex; gap: 2px; align-items: stretch; height: 28px; margin-top: .6rem; }
+.hist i { flex: 1; max-width: 8px; min-width: 3px; border-radius: 2px; background: #3ddc84; opacity: .85; }
+.hist i.bad { background: #ef5350; opacity: 1; }
+.pbody .credits { list-style: none; padding: 0; margin: 0; }
+.pbody .credits li { display: flex; flex-direction: column; padding: .65rem 0; border-bottom: 1px solid var(--edge); margin: 0; }
+.pbody .credits a { color: var(--ink); font-weight: 500; text-decoration: none; }
+.pbody .credits a::after { content: " \2197"; color: var(--steel); }
+.pbody .credits a:hover { color: var(--blue); }
+.pbody .credits span { color: var(--steel); font-size: .85rem; }
+.pbody a.plain-link { color: var(--blue); }
+.gamegrid { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin-top: .6rem; }
+.gcard { text-align: left; background: rgba(255,255,255,.02); border: 1px solid var(--edge); border-radius: 12px;
+  padding: .8rem .9rem; color: var(--ink); font: inherit; cursor: pointer; }
+.gcard:hover { border-color: var(--blue-dim); }
+.gcard b { display: block; font-weight: 500; }
+.gcard small { color: var(--steel); font-size: .78rem; }
+.filebtn { display: inline-block; cursor: pointer; margin-top: 0; }
+.filebtn input { display: none; }
+.f input[type=color] { width: 3.2rem; height: 2.4rem; padding: 0; border: 1px solid var(--edge); border-radius: 8px; background: var(--void); cursor: pointer; }
+.f input[type=range] { width: 100%; accent-color: var(--blue); }
+.vidnote { color: #e6d49a; font-size: .82rem; min-height: 1.1rem; margin-top: .4rem; }
+</style>
+</head>
+<body>
+<div id="splash" aria-hidden="true"><div class="sp-mark">TSW<b>v2</b></div><div class="sp-bar"><i></i></div></div>
+<video id="bgvid" muted loop playsinline preload="auto" aria-hidden="true" hidden></video>
+<canvas id="sky" aria-hidden="true"></canvas>
+<button class="cog" id="cog" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+<button class="cog log" id="logbtn" aria-label="Change log" title="Change log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h7"/></svg></button>
+<button class="cog games" id="gamesbtn" aria-label="Games" title="Games"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 10v5M4.5 12.5h5"/><circle cx="16" cy="11.5" r=".7"/><circle cx="18.5" cy="13.5" r=".7"/></svg></button>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<div class="status" id="status" data-s="check" role="button" tabindex="0" title="Server info" aria-label="Server status. Open server info">
+  <span class="dot"></span>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="6" rx="1.5"/><rect x="3" y="14" width="18" height="6" rx="1.5"/><path d="M7 7h.01M7 17h.01"/></svg>
+  <span id="status-text">Checking server…</span>
+</div>
+
+<div class="overlay" id="settings" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="set-h">
+    <div class="phead"><h2 id="set-h">Settings</h2><button data-close aria-label="Close">&times;</button></div>
+    <div class="pbody f">
+      <label for="set-engine">Search engine</label>
+      <select id="set-engine"><option value="ddg">DuckDuckGo</option><option value="google">Google</option><option value="bing">Bing</option><option value="brave">Brave</option><option value="startpage">Startpage</option><option disabled>Tor (coming soon)</option></select>
+      <p class="hint">Google may ask you to prove you are not a robot.</p>
+
+      <label for="set-bg">Background</label>
+      <select id="set-bg"><option value="stars">Stars</option><option value="ice">Ice waves (interactive)</option><option value="aurora">Aurora</option><option value="city">City lights</option><option value="ocean">Night ocean</option><option value="solid">Solid color</option><option value="video">Video</option><option disabled>More coming soon</option></select>
+      <p class="hint">Ice waves react to your mouse or finger. On the stars background, click a star to make it shine.</p>
+      <label for="set-solid">Solid color</label>
+      <input type="color" id="set-solid" value="#0a0f1c">
+
+      <label for="set-vsrc">Video source</label>
+      <select id="set-vsrc"><option value="site">Site video</option><option value="mine">My video (from this device)</option></select>
+      <div class="row" style="margin-top:.7rem">
+        <label class="plain filebtn">Choose a video<input type="file" id="vid-file" accept="video/*"></label>
+        <button type="button" class="plain" id="vid-remove">Remove my video</button>
+      </div>
+      <label for="set-vbright">Video brightness</label>
+      <input type="range" id="set-vbright" min="20" max="100" step="5">
+      <p class="vidnote" id="vid-note" role="status"></p>
+      <p class="hint">Your own video stays on this device and is only used by you. Short loops work best.</p>
+
+      <label for="set-accent">Accent color</label>
+      <select id="set-accent"><option value="blue">Blue</option><option value="green">Green</option><option value="pink">Pink</option><option value="orange">Orange</option><option value="violet">Violet</option></select>
+      <label for="set-clock">Clock</label>
+      <select id="set-clock"><option value="12">12-hour</option><option value="24">24-hour</option><option value="off">Off</option></select>
+      <label for="set-season">Seasonal effects</label>
+      <select id="set-season"><option value="auto">Automatic</option><option value="snow">Snow</option><option value="bats">Bats</option><option value="off">Off</option></select>
+      <p class="hint">Automatic shows snow in winter and bats around Halloween.</p>
+      <label class="check"><input type="checkbox" id="set-stars"> Stars</label>
+      <label class="check"><input type="checkbox" id="set-shoot"> Shooting stars and rockets</label>
+      <label for="set-title">Tab title</label>
+      <input id="set-title" type="text" maxlength="40" placeholder="TSW v2" autocomplete="off">
+      <label for="set-icon">Tab icon</label>
+      <select id="set-icon"><option value="default">TSW v2</option><option value="doc">Document</option><option value="globe">Globe</option><option value="blank">Blank</option></select>
+      <p class="hint">The tab title and icon only change the TSW v2 tab.</p>
+      <label>App</label>
+      <button type="button" class="plain" id="install-btn" hidden style="margin-top:0">Install TSW v2 as an app</button>
+      <p class="hint">If the button is not shown, look for an install option in your browser's menu. On iPhone or iPad, tap Share, then Add to Home Screen.</p>
+      <p class="hint" style="margin-top:1.2rem">Settings are saved in this browser.</p>
+      <button type="button" class="plain" id="set-reset">Reset to defaults</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="games" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="gm-h">
+    <div class="phead"><h2 id="gm-h">Games</h2><button data-close aria-label="Close">&times;</button></div>
+    <div class="pbody">
+      <p class="hint" style="font-size:.92rem;margin:0 0 .4rem">Game sites that open through the proxy. Many games need features proxies cannot always handle, so some will not work.</p>
+      <div class="gamegrid">
+        <button class="gcard" data-site="https://poki.com"><b>Poki</b><small>Free browser games</small></button>
+        <button class="gcard" data-site="https://www.crazygames.com"><b>CrazyGames</b><small>Free browser games</small></button>
+        <button class="gcard" data-site="https://www.y8.com"><b>Y8</b><small>Free browser games</small></button>
+        <button class="gcard" data-site="https://itch.io/games/html5"><b>itch.io</b><small>Indie HTML5 games</small></button>
+        <button class="gcard" data-site="https://www.coolmathgames.com"><b>Coolmath Games</b><small>Puzzle and strategy</small></button>
+        <button class="gcard" data-site="https://play.geforcenow.com"><b>GeForce NOW</b><small>Cloud gaming</small></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="info" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="info-h">
+    <div class="phead"><h2 id="info-h">Server info</h2><button data-close aria-label="Close">&times;</button></div>
+    <div class="pbody">
+      <dl class="kv">
+        <div><dt>Status</dt><dd id="i-status">-</dd></div>
+        <div><dt>Server response time</dt><dd id="i-rtt">-</dd></div>
+        <div><dt>Proxy ping</dt><dd id="i-ping">-</dd></div>
+        <div><dt>Server IP address</dt><dd id="i-ip">-</dd></div>
+        <div><dt>Server uptime</dt><dd id="i-up">-</dd></div>
+      </dl>
+      <p class="hint" style="margin-top:.9rem">Response time is the round trip to the server. Proxy ping is the time to open the proxy's WebSocket connection, so it includes connection setup and reads higher than a plain ping. The IP address is the server's outside address, which is what websites see.</p>
+      <h4 class="subh">History <small style="color:var(--steel);font-weight:400">checks from this browser</small></h4>
+      <div class="hist" id="hist" aria-label="Recent checks"></div>
+      <p class="hint" id="hist-sum"></p>
+      <div class="row"><button class="primary" type="button" id="i-refresh">Refresh</button><button class="plain" type="button" id="i-clear">Clear history</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="addlink" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="al-h">
+    <div class="phead"><h2 id="al-h">Add a shortcut</h2><button data-close aria-label="Close">&times;</button></div>
+    <form class="pbody f" id="al-form" autocomplete="off">
+      <label for="al-name">Name</label>
+      <input id="al-name" type="text" maxlength="20" placeholder="YouTube">
+      <label for="al-url">Web address</label>
+      <input id="al-url" type="text" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="youtube.com">
+      <p class="err" id="al-err" role="alert"></p>
+      <div class="row"><button class="primary" type="submit">Add shortcut</button><button class="plain" type="button" data-close>Cancel</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="overlay wake" id="wake" hidden role="alertdialog" aria-labelledby="wake-t">
+  <div class="wakebox">
+    <div class="spin" aria-hidden="true"></div>
+    <h2 id="wake-t">Waking the server up</h2>
+    <p id="wake-p">This can take up to a minute. The page reloads by itself when it is ready.</p>
+    <button type="button" class="plain" id="wake-x" hidden>Dismiss</button>
+  </div>
+</div>
+
+<div class="overlay" id="log" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="log-title">
+    <div class="phead"><h2 id="log-title">Change log</h2><button id="log-close" aria-label="Close">&times;</button></div>
+    <div class="tabs"><button class="on" data-tab="updates">Updates</button><button data-tab="credits">Credits</button></div>
+    <div class="pbody" id="tab-updates">
+      <h3>TSW v2 1.4<span>Video and more backgrounds</span></h3>
+      <p class="date">October 2026</p>
+      <ul>
+        <li>Video background: use a video from the site or one from your own device.</li>
+        <li>New backgrounds: aurora, city lights, night ocean, and a solid color.</li>
+        <li>Accent color picker and a clock and date on the homepage.</li>
+        <li>A short loading animation when TSW v2 opens.</li>
+        <li>Server status now keeps a history of recent checks.</li>
+        <li>Games tab now has shortcuts to game sites.</li>
+        <li>Cleaner Credits with links to every project, and a source code link.</li>
+        <li>Faster loading with file compression and caching.</li>
+      </ul>
+      <h3 class="older">TSW v2 1.3<span>Backgrounds and polish</span></h3>
+      <p class="date">October 2026</p>
+      <ul>
+        <li>New interactive ice waves background, chosen in Settings. More backgrounds are coming soon.</li>
+        <li>Seasonal effects: snow in winter and bats around Halloween.</li>
+        <li>Click a star to make it shine.</li>
+        <li>Friendly messages explaining why a site did not load.</li>
+        <li>Open in new tab, a spinning reload button, and a new look for the 404 page.</li>
+        <li>Brave and Startpage search, and a Report a broken site link.</li>
+        <li>Bigger touch targets on phones, and TSW v2 can be installed as an app.</li>
+      </ul>
+      <h3 class="older">TSW v2 1.2<span>Rockets and server info</span></h3>
+      <p class="date">October 2026</p>
+      <ul>
+        <li>Tiny rockets now fly across the sky between the shooting stars, and stars sometimes shine.</li>
+        <li>New Games tab in the top right. It is coming soon.</li>
+        <li>Click the server status to see response time, proxy ping, and the server IP address.</li>
+        <li>Browser options in Settings, starting with Tor browser (coming soon).</li>
+        <li>Slightly bigger buttons in the top right.</li>
+      </ul>
+      <h3 class="older">TSW v2 1.1<span>Settings and shortcuts</span></h3>
+      <p class="date">October 2026</p>
+      <ul>
+        <li>Settings now work: choose a search engine, turn stars and shooting stars on or off, and change the tab title and icon.</li>
+        <li>Add your own shortcuts with the + button. They are saved in your browser.</li>
+        <li>A waking-up screen shows while the server starts back up.</li>
+      </ul>
+      <h3 class="older">TSW v2 1.0<span>Site launch</span></h3>
+      <p class="date">October 2026</p>
+      <ul>
+        <li>TSW v2 goes live with a real web proxy built on the Scramjet engine.</li>
+        <li>Search bar and address bar, with back, forward, reload and home.</li>
+        <li>Shortcuts for TikTok, Instagram and GeForce NOW.</li>
+        <li>Server status in the bottom left corner.</li>
+      </ul>
+    </div>
+    <div class="pbody" id="tab-credits" hidden>
+      <h3 class="made">Made by Alex Dalbey</h3>
+      <p class="date">Built with</p>
+      <ul class="credits">
+        <li><a href="https://github.com/MercuryWorkshop/scramjet" target="_blank" rel="noopener noreferrer">Scramjet</a><span>The web proxy engine, by Mercury Workshop. MIT license.</span></li>
+        <li><a href="https://github.com/MercuryWorkshop/Scramjet-App" target="_blank" rel="noopener noreferrer">Scramjet-App</a><span>The server this site is built on, by Mercury Workshop. AGPL-3.0 license.</span></li>
+        <li><a href="https://github.com/MercuryWorkshop/libcurl-transport" target="_blank" rel="noopener noreferrer">libcurl-transport</a><span>Carries proxied traffic, by Mercury Workshop.</span></li>
+        <li><a href="https://www.npmjs.com/package/@mercuryworkshop/bare-mux" target="_blank" rel="noopener noreferrer">bare-mux</a><span>Connects the proxy to its transport, by Mercury Workshop.</span></li>
+        <li><a href="https://www.npmjs.com/package/@mercuryworkshop/wisp-js" target="_blank" rel="noopener noreferrer">wisp-js</a><span>The proxy's WebSocket server, by Mercury Workshop.</span></li>
+        <li><a href="https://fastify.dev" target="_blank" rel="noopener noreferrer">Fastify</a><span>The web server framework.</span></li>
+      </ul>
+      <h4 class="subh">Source code</h4>
+      <p class="hint" style="font-size:.88rem">Because TSW v2 is built on Scramjet-App (AGPL-3.0), its source code is public. <a class="plain-link" href="https://github.com/badpuppet0/Scramjet-App" target="_blank" rel="noopener noreferrer">View the source code on GitHub</a>.</p>
+    </div>
+  </div>
+</div>
+
+<main id="home">
+  <div class="hero">
+    <h1 class="mark">TSW<b>v2</b></h1>
+    <p class="clock" id="clock"></p>
+    <form class="field" id="home-form" autocomplete="off">
+      <input id="home-input" type="text" inputmode="url" autocapitalize="off" spellcheck="false"
+             placeholder="Search or enter a web address" aria-label="Search or enter a web address">
+      <button class="go" type="submit" aria-label="Open">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </form>
+    <nav class="links" id="links" aria-label="Shortcuts">
+      <button type="button" data-url="https://www.tiktok.com">TikTok</button>
+      <button type="button" data-url="https://www.instagram.com">Instagram</button>
+      <button type="button" data-url="https://play.geforcenow.com">GeForce NOW</button>
+    </nav>
+    <p class="msg" id="home-msg" role="status"></p>
+  </div>
+  <p class="note">Some sites block proxies and won't load. <a href="https://docs.google.com/forms/d/e/1FAIpQLScupiUZuqQsngFai_QPQRWn06LpuZy3VGZOEyIUY0DAZ0qJxw/viewform" target="_blank" rel="noopener noreferrer">Report a broken site</a></p>
+</main>
+
+<section id="browse" hidden>
+  <div class="bar">
+    <button id="btn-home" title="Home" aria-label="Home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></svg></button>
+    <button id="btn-back" title="Back" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <button id="btn-fwd" title="Forward" aria-label="Forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+    <button id="btn-reload" title="Reload" aria-label="Reload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.5-5.8M20 4v5h-5"/></svg></button>
+    <button id="btn-newtab" title="Open in new tab" aria-label="Open in new tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></button>
+    <input class="addr" id="addr" type="text" inputmode="url" autocapitalize="off" spellcheck="false" aria-label="Address">
+    <div class="load" id="load"></div>
+  </div>
+  <div id="view"></div>
+  <div class="diag" id="diag" hidden role="status">
+    <button class="x" id="diag-x" aria-label="Dismiss">&times;</button>
+    <h3 id="diag-t"></h3>
+    <p id="diag-p"></p>
+    <div class="row">
+      <button class="plain" type="button" id="diag-reload">Reload</button>
+      <button class="plain" type="button" id="diag-tab">Open in new tab</button>
+      <a class="plain" id="diag-report" href="https://docs.google.com/forms/d/e/1FAIpQLScupiUZuqQsngFai_QPQRWn06LpuZy3VGZOEyIUY0DAZ0qJxw/viewform" target="_blank" rel="noopener noreferrer">Report this site</a>
+    </div>
+  </div>
+</section>
+
+<!-- Proxy engine scripts: order matters. These files are served by the Scramjet-App server. -->
+<script src="/baremux/index.js"></script>
+<script src="/scram/scramjet.all.js"></script>
+<script src="register-sw.js"></script>
+<script src="engine.js"></script>
+
+<script>
+function $(id) { return document.getElementById(id); }
+var store = {
+  get: function (k, d) { try { var v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+  del: function (k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+/* ===================== backgrounds, seasons, rockets ===================== */
+(function () {
+  var c = $('sky'), g = c.getContext('2d');
+  var stars = [], shots = [], puffs = [], shines = [], flakes = [], bats = [], ripples = [], drops = [], bokeh = [], layers = [];
+  var w = 0, h = 0, dpr = 1, next = 0, nextShine = 1500, lastRipple = 0, lastX = 0, lastY = 0, seeded = '', bgSeeded = '';
+  var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var COLORS = ['#ffffff', '#ffffff', '#ffffff', '#ffffff', '#eef4ff'];
+  var BGS = ['stars', 'ice', 'aurora', 'city', 'ocean', 'solid', 'video'];
+  var GRADS = {
+    ice: [[0, '#020711'], [1, '#07203a']], aurora: [[0, '#01040a'], [1, '#06102a']], rain: [[0, '#0a111e'], [1, '#162033']],
+    city: [[0, '#05060f'], [.65, '#1b1236'], [1, '#4a2250']], ocean: [[0, '#03060f'], [.55, '#0b1834'], [.5501, '#08162c'], [1, '#020711']]
+  };
+
+  function opt() {
+    var o = window.TSWSky || {}, bg = BGS.indexOf(o.bg) >= 0 ? o.bg : 'stars';
+    if (bg === 'video' && !window.TSWVideoOk) bg = 'stars';   /* stars until the video is really playing */
+    return { stars: o.stars !== false, shoot: o.shoot !== false, bg: bg, season: o.season || 'auto', solid: o.solid || '#0a0f1c', accent: o.accent || '#5aa2ff' };
+  }
+  function seasonOf(o) {
+    if (o.season === 'off') return '';
+    if (o.season === 'snow' || o.season === 'bats') return o.season;
+    var d = new Date(), m = d.getMonth(), day = d.getDate();
+    if (m === 11 || m === 0 || m === 1) return 'snow';
+    if ((m === 9 && day >= 20) || (m === 10 && day <= 1)) return 'bats';
+    return '';
+  }
+  function size() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = innerWidth; h = innerHeight;
+    c.width = w * dpr; c.height = h * dpr;
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var n = Math.round(w * h / 5200);
+    stars = [];
+    for (var i = 0; i < n; i++) {
+      stars.push({ x: Math.random() * w, y: Math.random() * h,
+        r: Math.random() < .12 ? 1.6 : Math.random() * .9 + .5,
+        a: Math.random() * .35 + .65, s: Math.random() * 2 + .6, p: Math.random() * 6.28,
+        c: COLORS[Math.floor(Math.random() * COLORS.length)] });
+    }
+    seeded = ''; bgSeeded = '';
+  }
+  function seed(kind) {
+    var i;
+    if (kind === 'snow') {
+      flakes = [];
+      for (i = 0; i < Math.round(w / 14); i++) flakes.push({ x: Math.random() * w, y: Math.random() * h, r: .8 + Math.random() * 2,
+        vy: .35 + Math.random() * .9, p: Math.random() * 6.28, s: .5 + Math.random() * 1.2 });
+    } else if (kind === 'bats') {
+      bats = [];
+      for (i = 0; i < 5; i++) bats.push({ x: Math.random() * w, y: h * .1 + Math.random() * h * .6,
+        vx: (Math.random() < .5 ? -1 : 1) * (.7 + Math.random() * 1.1), p: Math.random() * 6.28, sc: .9 + Math.random() * .8, d: Math.random() * 6.28 });
+    }
+  }
+  function newDrop(initial) { return { x: Math.random() * w, y: initial ? Math.random() * h : -10, r: 1.5 + Math.random() * 3.5, hold: Math.random() * 300, trail: 0 }; }
+  function seedBg(bg) {
+    var i;
+    if (bg === 'rain') {
+      drops = []; for (i = 0; i < Math.round(w * h / 14000); i++) drops.push(newDrop(true));
+      var BC = ['255,200,120', '255,140,170', '140,210,255', '200,170,255'];
+      bokeh = []; for (i = 0; i < 14; i++) bokeh.push({ x: Math.random() * w, y: Math.random() * h * .85, r: 30 + Math.random() * 60,
+        c: BC[Math.floor(Math.random() * BC.length)], a: .05 + Math.random() * .07, p: Math.random() * 6.28 });
+    } else if (bg === 'city') {
+      layers = [];
+      [{ sp: .15, min: 40, max: 90, a: .12, b: .3, col: '#0b0a1c', win: 0 }, { sp: .3, min: 50, max: 110, a: .16, b: .4, col: '#0e0c24', win: .5 },
+       { sp: .6, min: 60, max: 130, a: .2, b: .52, col: '#120f2c', win: 1 }].forEach(function (sp) {
+        var bs = [], x = 0;
+        while (x < w * 1.5 + 200) { var bw = sp.min + Math.random() * (sp.max - sp.min); bs.push({ x: x, w: bw, h: h * (sp.a + Math.random() * (sp.b - sp.a)), seed: Math.random() }); x += bw + Math.random() * 6; }
+        layers.push({ sp: sp.sp, b: bs, total: x, col: sp.col, win: sp.win, off: Math.random() * 400 });
+      });
+    }
+  }
+  function spawn() {
+    var fromLeft = Math.random() < .5;
+    if (Math.random() < .2) {   /* 1 in 5 is a tiny rocket */
+      var rvx = (fromLeft ? 1 : -1) * (2.4 + Math.random() * 1.2);
+      shots.push({ rocket: true, x: fromLeft ? -30 : w + 30, y: h * .12 + Math.random() * h * .55,
+        vx: rvx, vy: Math.random() * 1.8 - .7, life: 0, max: (w + 120) / Math.abs(rvx) + 20 });
+    } else {
+      shots.push({ x: Math.random() * w * .8 + (fromLeft ? 0 : w * .2), y: Math.random() * h * .4,
+        vx: (fromLeft ? 1 : -1) * (6 + Math.random() * 4), vy: 2.4 + Math.random() * 2, life: 0, max: 55 + Math.random() * 25 });
+    }
+  }
+  function drawRocket(o, accent) {
+    var ang = Math.atan2(o.vy, o.vx), ux = Math.cos(ang), uy = Math.sin(ang);
+    var x0 = o.x - ux * 9, y0 = o.y - uy * 9;
+    var gr = g.createLinearGradient(x0, y0, o.x - ux * 85, o.y - uy * 85);
+    gr.addColorStop(0, 'rgba(255,190,110,.95)'); gr.addColorStop(.5, 'rgba(255,110,70,.45)'); gr.addColorStop(1, 'rgba(255,80,60,0)');
+    g.globalAlpha = 1; g.lineCap = 'round'; g.strokeStyle = gr; g.lineWidth = 3.4;
+    g.beginPath(); g.moveTo(x0, y0); g.lineTo(o.x - ux * 85, o.y - uy * 85); g.stroke();
+    var gc = g.createLinearGradient(x0, y0, o.x - ux * 42, o.y - uy * 42);
+    gc.addColorStop(0, 'rgba(255,245,210,.95)'); gc.addColorStop(1, 'rgba(255,245,210,0)');
+    g.strokeStyle = gc; g.lineWidth = 1.3;
+    g.beginPath(); g.moveTo(x0, y0); g.lineTo(o.x - ux * 42, o.y - uy * 42); g.stroke();
+    g.save(); g.translate(o.x, o.y); g.rotate(ang); g.scale(1.15, 1.15);
+    var fl = 9 + Math.random() * 5;
+    g.fillStyle = '#ffb84d'; g.beginPath(); g.moveTo(-7, -2.2); g.lineTo(-7 - fl, 0); g.lineTo(-7, 2.2); g.closePath(); g.fill();
+    g.fillStyle = '#fff3c4'; g.beginPath(); g.moveTo(-7, -1); g.lineTo(-7 - fl * .55, 0); g.lineTo(-7, 1); g.closePath(); g.fill();
+    g.fillStyle = '#ff5a6e';
+    g.beginPath(); g.moveTo(-6, -3); g.lineTo(-10, -7); g.lineTo(-2, -3); g.closePath(); g.fill();
+    g.beginPath(); g.moveTo(-6, 3); g.lineTo(-10, 7); g.lineTo(-2, 3); g.closePath(); g.fill();
+    g.fillStyle = '#eef3ff'; g.beginPath(); g.moveTo(-7, -3); g.lineTo(3, -3);
+    g.quadraticCurveTo(10, -2.5, 11.5, 0); g.quadraticCurveTo(10, 2.5, 3, 3); g.lineTo(-7, 3); g.closePath(); g.fill();
+    g.fillStyle = accent; g.beginPath(); g.arc(1.5, 0, 1.7, 0, 6.2832); g.fill();
+    g.restore();
+  }
+  function drawBat(b, t) {
+    var flap = Math.sin(t / 80 + b.p);
+    g.save(); g.translate(b.x, b.y); g.scale(b.sc * (b.vx < 0 ? -1 : 1), b.sc);
+    g.globalAlpha = .9; g.fillStyle = '#8a82a6';
+    g.beginPath(); g.ellipse(0, 0, 3, 5, 0, 0, 6.2832); g.fill();
+    for (var sd = -1; sd <= 1; sd += 2) {
+      g.save(); g.scale(sd, 1); g.beginPath(); g.moveTo(2, -2);
+      g.quadraticCurveTo(11, -9 - flap * 6, 19, -3 + flap * 5); g.quadraticCurveTo(15, -1, 13, 4);
+      g.quadraticCurveTo(9, 0, 6, 3); g.quadraticCurveTo(4, 1, 2, 3); g.closePath(); g.fill(); g.restore();
+    }
+    g.beginPath(); g.moveTo(-2, -4); g.lineTo(-1, -8); g.lineTo(0, -4); g.moveTo(0, -4); g.lineTo(1, -8); g.lineTo(2, -4); g.fill();
+    g.restore();
+  }
+
+  /* ---- base fill (behind the stars) ---- */
+  function drawBase(o) {
+    g.globalAlpha = 1;
+    if (GRADS[o.bg]) {
+      var gr = g.createLinearGradient(0, 0, 0, h);
+      GRADS[o.bg].forEach(function (st) { gr.addColorStop(st[0], st[1]); });
+      g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    } else if (o.bg === 'solid') { g.fillStyle = o.solid; g.fillRect(0, 0, w, h); }
+  }
+  function showStar(bg, s, i) {
+    if (bg === 'rain' || bg === 'video') return false;
+    if (bg === 'ice') return i % 3 === 0 && s.y < h * .55;
+    if (bg === 'city') return s.y < h * .5;
+    if (bg === 'ocean') return s.y < h * .52;
+    return true;
+  }
+
+  /* ---- ice: wavy layers that bend where you move the pointer ---- */
+  function drawWaves(t) {
+    var tt = still ? 0 : t, i, k, x, pts, y, rp, d, env, wgt;
+    for (k = ripples.length - 1; k >= 0; k--) { ripples[k].age++; if (ripples[k].age > 140) ripples.splice(k, 1); }
+    for (i = 0; i < 6; i++) {
+      var base = h * (.42 + i * .1), amp = 16 + i * 7, f1 = .0045 - i * .0004, f2 = .011 - i * .0006, sp = .00042 + i * .00009;
+      pts = [];
+      for (x = 0; x <= w + 8; x += 8) {
+        y = base + Math.sin(x * f1 + tt * sp * 6 + i) * amp + Math.sin(x * f2 - tt * sp * 9 + i * 2) * amp * .45;
+        for (k = 0; k < ripples.length; k++) {
+          rp = ripples[k]; d = x - rp.x;
+          wgt = Math.exp(-Math.pow(base - rp.y, 2) / (2 * 140 * 140)) * .9 + .25;
+          env = Math.exp(-(d * d) / (2 * Math.pow(70 + rp.age * 2.2, 2)));
+          y += rp.a * wgt * env * Math.sin(d * .045 - rp.age * .28) * Math.exp(-rp.age / 55);
+        }
+        pts.push(y);
+      }
+      var grad = g.createLinearGradient(0, base - amp * 2, 0, h);
+      grad.addColorStop(0, 'rgba(' + (150 + i * 12) + ',' + (215 + i * 6) + ',255,' + (.10 + i * .05) + ')');
+      grad.addColorStop(1, 'rgba(8,30,60,0)');
+      g.globalAlpha = 1; g.fillStyle = grad; g.beginPath(); g.moveTo(0, pts[0]);
+      for (k = 1; k < pts.length; k++) g.lineTo(k * 8, pts[k]);
+      g.lineTo(w + 8, h); g.lineTo(0, h); g.closePath(); g.fill();
+      g.strokeStyle = 'rgba(220,242,255,' + (.25 + i * .07) + ')'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(0, pts[0]);
+      for (k = 1; k < pts.length; k++) g.lineTo(k * 8, pts[k]);
+      g.stroke();
+    }
+  }
+
+  /* ---- aurora: soft moving green and violet light bands ---- */
+  function drawAurora(t) {
+    var tt = still ? 0 : t, prev = g.globalCompositeOperation;
+    g.globalCompositeOperation = 'lighter';
+    [{ c: '60,255,170', y: .36, a: .20, s: .00022, p: 0 }, { c: '90,230,200', y: .46, a: .15, s: .00031, p: 2 },
+     { c: '160,110,255', y: .40, a: .17, s: .00026, p: 4 }, { c: '120,255,160', y: .52, a: .12, s: .00019, p: 1 }].forEach(function (b) {
+      for (var x = 0; x <= w; x += 8) {
+        var n = Math.sin(x * .004 + tt * b.s * 6 + b.p) * .5 + Math.sin(x * .0095 - tt * b.s * 4 + b.p * 2) * .3 + Math.sin(x * .0021 + tt * b.s * 2) * .2;
+        var rim = h * b.y + n * h * .10, ht = h * (.20 + .10 * Math.sin(x * .006 + tt * b.s * 5 + b.p * 3));
+        var gr = g.createLinearGradient(0, rim - ht, 0, rim);
+        gr.addColorStop(0, 'rgba(' + b.c + ',0)'); gr.addColorStop(.85, 'rgba(' + b.c + ',' + b.a + ')'); gr.addColorStop(1, 'rgba(' + b.c + ',' + (b.a * 1.5) + ')');
+        g.fillStyle = gr; g.fillRect(x, rim - ht, 9, ht);
+      }
+    });
+    g.globalCompositeOperation = prev;
+  }
+
+  /* ---- rain on glass: soft lights behind sliding drops ---- */
+  function drawRain(t) {
+    var i, d;
+    for (i = 0; i < bokeh.length; i++) {
+      var b = bokeh[i]; g.globalAlpha = b.a * (.8 + .2 * Math.sin(t / 1500 + b.p)); g.fillStyle = 'rgb(' + b.c + ')';
+      g.beginPath(); g.arc(b.x, b.y, b.r, 0, 6.2832); g.fill();
+    }
+    for (i = 0; i < drops.length; i++) {
+      d = drops[i];
+      if (!still) {
+        if (d.hold > 0) d.hold--;
+        else { var vy = .6 + Math.random() * 1.4; d.y += vy; d.trail = Math.min(d.trail + vy, 60); if (Math.random() < .02) d.hold = 120 + Math.random() * 400; }
+        d.trail *= .997;
+      }
+      if (d.y > h + 20) { drops[i] = newDrop(false); continue; }
+      if (d.trail > 2) {
+        var tg = g.createLinearGradient(d.x, d.y, d.x, d.y - d.trail);
+        tg.addColorStop(0, 'rgba(190,215,255,.16)'); tg.addColorStop(1, 'rgba(190,215,255,0)');
+        g.globalAlpha = 1; g.strokeStyle = tg; g.lineWidth = d.r * .6; g.lineCap = 'round';
+        g.beginPath(); g.moveTo(d.x, d.y); g.lineTo(d.x, d.y - d.trail); g.stroke();
+      }
+      g.globalAlpha = .2; g.fillStyle = 'rgb(185,210,255)'; g.beginPath(); g.arc(d.x, d.y, d.r, 0, 6.2832); g.fill();
+      g.globalAlpha = .4; g.fillStyle = '#ffffff'; g.beginPath(); g.arc(d.x - d.r * .3, d.y - d.r * .3, d.r * .35, 0, 6.2832); g.fill();
+    }
+  }
+
+  /* ---- city lights: slow drifting skyline ---- */
+  function rn(n) { return Math.abs(Math.sin(n * 12.9898) * 43758.5453) % 1; }
+  function drawCity(t) {
+    var tt = still ? 0 : t, li, bi, r, c2;
+    for (li = 0; li < layers.length; li++) {
+      var L = layers[li], off = (tt * L.sp * .03 + L.off) % L.total;
+      g.globalAlpha = 1; g.fillStyle = L.col;
+      for (bi = 0; bi < L.b.length; bi++) {
+        var b = L.b[bi], bx = b.x - off; if (bx + b.w < 0) bx += L.total; if (bx > w) continue;
+        var by = h - b.h; g.fillRect(bx, by, b.w, b.h);
+        if (L.win) {
+          var cols = Math.floor(b.w / 9), rows = Math.floor(b.h / 12);
+          g.fillStyle = 'rgba(255,214,120,' + (.75 * L.win) + ')';
+          for (r = 0; r < rows; r++) for (c2 = 0; c2 < cols; c2++) {
+            var k = b.seed * 1000 + r * 31 + c2 * 7, lit = rn(k) > .6;
+            if (rn(k + Math.floor(tt / 6000)) > .93) lit = !lit;
+            if (lit) g.fillRect(bx + 4 + c2 * 9, by + 6 + r * 12, 3, 5);
+          }
+          g.fillStyle = L.col;
+        }
+      }
+    }
+  }
+
+  /* ---- night ocean: calm water with a moon reflection ---- */
+  function drawOcean(t) {
+    var hz = h * .55, tt = still ? 0 : t, i, x, f, y, amp, yy;
+    var mx = w * .7, my = h * .22, mr = Math.min(w, h) * .045;
+    var mg = g.createRadialGradient(mx, my, mr * .5, mx, my, mr * 5);
+    mg.addColorStop(0, 'rgba(220,235,255,.35)'); mg.addColorStop(1, 'rgba(220,235,255,0)');
+    g.globalAlpha = 1; g.fillStyle = mg; g.fillRect(mx - mr * 5, my - mr * 5, mr * 10, mr * 10);
+    g.fillStyle = '#eaf2ff'; g.beginPath(); g.arc(mx, my, mr, 0, 6.2832); g.fill();
+    for (i = 0; i < 22; i++) {
+      f = i / 21; y = hz + Math.pow(f, 1.6) * (h - hz); amp = 1 + f * 7;
+      g.strokeStyle = 'rgba(120,170,230,' + (.05 + f * .12) + ')'; g.lineWidth = 1 + f * 1.2; g.beginPath();
+      for (x = 0; x <= w; x += 10) {
+        yy = y + Math.sin(x * (.012 - f * .006) + tt * .0006 * (1 + f) + i) * amp;
+        if (x === 0) g.moveTo(x, yy); else g.lineTo(x, yy);
+      }
+      g.stroke();
+    }
+    for (i = 0; i < 40; i++) {
+      f = i / 40; y = hz + 4 + f * (h - hz);
+      var hw = (6 + f * 70) * (.4 + .6 * Math.abs(Math.sin(tt * .001 + i * 1.7)));
+      g.fillStyle = 'rgba(220,235,255,' + (.35 - .25 * f) + ')';
+      g.fillRect(mx - hw + Math.sin(tt * .0008 + i) * 6, y, hw * 2, 1.6 + f * 1.5);
+    }
+  }
+
+  function frame(t) {
+    var o = opt(), se = still ? '' : seasonOf(o), i;
+    g.clearRect(0, 0, w, h);
+    drawBase(o);
+    if (se !== seeded) { seeded = se; seed(se); }
+    if (o.bg !== bgSeeded) { bgSeeded = o.bg; seedBg(o.bg); }
+    if (o.stars) {
+      for (i = 0; i < stars.length; i++) {
+        var s = stars[i];
+        if (!showStar(o.bg, s, i)) continue;
+        var tw = still ? 1 : .8 + .2 * Math.sin(t / 1000 * s.s + s.p);
+        g.globalAlpha = s.a * tw; g.fillStyle = s.c;
+        g.beginPath(); g.arc(s.x, s.y, s.r, 0, 6.2832); g.fill();
+      }
+    }
+    if (o.bg === 'ice') drawWaves(t);
+    else if (o.bg === 'aurora') drawAurora(t);
+    else if (o.bg === 'rain') drawRain(t);
+    else if (o.bg === 'city') drawCity(t);
+    else if (o.bg === 'ocean') drawOcean(t);
+    if (se === 'snow') {
+      for (i = 0; i < flakes.length; i++) {
+        var fk = flakes[i]; fk.y += fk.vy; fk.x += Math.sin(t / 1000 * fk.s + fk.p) * .4;
+        if (fk.y > h + 4) { fk.y = -4; fk.x = Math.random() * w; }
+        g.globalAlpha = .55 + fk.r * .15; g.fillStyle = '#ffffff';
+        g.beginPath(); g.arc(fk.x, fk.y, fk.r, 0, 6.2832); g.fill();
+      }
+    } else if (se === 'bats') {
+      for (i = 0; i < bats.length; i++) {
+        var bt = bats[i]; bt.x += bt.vx; bt.y += Math.sin(t / 700 + bt.d) * .4;
+        if (bt.x > w + 40) bt.x = -40; else if (bt.x < -40) bt.x = w + 40;
+        drawBat(bt, t);
+      }
+    }
+    if (o.stars && !still && showStar(o.bg, { y: 0 }, 0)) {
+      if (t > nextShine && stars.length) {   /* once in a while one star shines */
+        var cand = stars[Math.floor(Math.random() * stars.length)];
+        if (showStar(o.bg, cand, 0)) shines.push({ s: cand, life: 0, max: 50 });
+        nextShine = t + 1800 + Math.random() * 3200;
+      }
+    }
+    if (!still) {
+      for (var m = shines.length - 1; m >= 0; m--) {
+        var sh = shines[m]; sh.life++;
+        if (sh.life >= sh.max) { shines.splice(m, 1); continue; }
+        var f2 = Math.sin(Math.PI * sh.life / sh.max), L = (4 + 12 * f2) * (sh.big ? 1.7 : 1);
+        g.fillStyle = '#ffffff'; g.strokeStyle = '#ffffff'; g.lineCap = 'round';
+        g.globalAlpha = .22 * f2; g.beginPath(); g.arc(sh.s.x, sh.s.y, (5 + 4 * f2) * (sh.big ? 1.6 : 1), 0, 6.2832); g.fill();
+        g.globalAlpha = .9 * f2; g.lineWidth = 1.1;
+        g.beginPath(); g.moveTo(sh.s.x - L, sh.s.y); g.lineTo(sh.s.x + L, sh.s.y);
+        g.moveTo(sh.s.x, sh.s.y - L); g.lineTo(sh.s.x, sh.s.y + L); g.stroke();
+        g.globalAlpha = .45 * f2; g.lineWidth = .8; var dd = L * .55;
+        g.beginPath(); g.moveTo(sh.s.x - dd, sh.s.y - dd); g.lineTo(sh.s.x + dd, sh.s.y + dd);
+        g.moveTo(sh.s.x - dd, sh.s.y + dd); g.lineTo(sh.s.x + dd, sh.s.y - dd); g.stroke();
+      }
+    }
+    if (!o.shoot) { shots.length = 0; puffs.length = 0; }
+    else if (!still) {
+      if (t > next) { spawn(); if (Math.random() < .3) spawn(); next = t + 1400 + Math.random() * 2600; }
+      for (var k = puffs.length - 1; k >= 0; k--) {
+        var pf = puffs[k]; pf.life++;
+        if (pf.life >= pf.max) { puffs.splice(k, 1); continue; }
+        g.globalAlpha = .45 * (1 - pf.life / pf.max); g.fillStyle = 'rgb(255,190,130)';
+        g.beginPath(); g.arc(pf.x, pf.y, pf.r + pf.life * .12, 0, 6.2832); g.fill();
+      }
+      for (var j = shots.length - 1; j >= 0; j--) {
+        var q = shots[j]; q.x += q.vx; q.y += q.vy; q.life++;
+        if (q.rocket) {
+          if (q.life > q.max || q.y < -40 || q.y > h + 40) { shots.splice(j, 1); continue; }
+          if (q.life % 2 === 0) puffs.push({ x: q.x - q.vx * 3 + (Math.random() - .5) * 3, y: q.y - q.vy * 3 + (Math.random() - .5) * 3,
+            r: 1.4 + Math.random() * 1.5, life: 0, max: 34 });
+          drawRocket(q, o.accent);
+          continue;
+        }
+        var f = 1 - q.life / q.max;
+        if (f <= 0) { shots.splice(j, 1); continue; }
+        var len = 20, tx = q.x - q.vx * len, ty = q.y - q.vy * len;
+        var grad = g.createLinearGradient(q.x, q.y, tx, ty);
+        grad.addColorStop(0, 'rgba(255,255,255,' + f + ')');
+        grad.addColorStop(1, 'rgba(255,255,255,0)');
+        g.globalAlpha = 1; g.strokeStyle = grad; g.lineWidth = 1.8; g.lineCap = 'round';
+        g.beginPath(); g.moveTo(q.x, q.y); g.lineTo(tx, ty); g.stroke();
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+  function interactive(el) {
+    return !!(el && el.closest && el.closest('button,input,select,textarea,a,label,form,.overlay,.status,.links,.cog'));
+  }
+  addEventListener('pointerdown', function (ev) {
+    if (still || !$('browse').hidden || interactive(ev.target)) return;
+    var o = opt();
+    if (o.bg === 'ice') { ripples.push({ x: ev.clientX, y: ev.clientY, a: 42, age: 0 }); if (ripples.length > 14) ripples.shift(); return; }
+    var best = null, bd = 1600, i;   /* nearest visible star within 40px */
+    for (i = 0; i < stars.length; i++) {
+      if (!showStar(o.bg, stars[i], i)) continue;
+      var dx = stars[i].x - ev.clientX, dy = stars[i].y - ev.clientY, dist = dx * dx + dy * dy;
+      if (dist < bd) { bd = dist; best = stars[i]; }
+    }
+    if (best) shines.push({ s: best, life: 0, max: 80, big: true });
+  }, { passive: true });
+  addEventListener('pointermove', function (ev) {
+    if (still || !$('browse').hidden || opt().bg !== 'ice') return;
+    var now = performance.now(); if (now - lastRipple < 45) return;
+    var dx = ev.clientX - lastX, dy = ev.clientY - lastY, sp = Math.min(Math.sqrt(dx * dx + dy * dy), 60);
+    lastX = ev.clientX; lastY = ev.clientY;
+    if (sp < 3) return;
+    lastRipple = now; ripples.push({ x: ev.clientX, y: ev.clientY, a: 6 + sp * .45, age: 0 });
+    if (ripples.length > 14) ripples.shift();
+  }, { passive: true });
+  addEventListener('resize', size);
+  size(); requestAnimationFrame(frame);
+})();
+
+/* ===================== video background ===================== */
+(function () {
+  var v = $('bgvid'), cur = '', objUrl = '', DB = 'tsw', STORE = 'files', KEY = 'bgvideo';
+  var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function db() {
+    return new Promise(function (res, rej) {
+      var r; try { r = indexedDB.open(DB, 1); } catch (e) { return rej(e); }
+      r.onupgradeneeded = function () { r.result.createObjectStore(STORE); };
+      r.onsuccess = function () { res(r.result); }; r.onerror = function () { rej(r.error); };
+    });
+  }
+  function tx(mode, fn) {
+    return db().then(function (d) {
+      return new Promise(function (res, rej) {
+        var t = d.transaction(STORE, mode), q = fn(t.objectStore(STORE));
+        t.oncomplete = function () { res(q && q.result); }; t.onerror = t.onabort = function () { rej(t.error); };
+      });
+    });
+  }
+  function note(msg) { var n = $('vid-note'); if (n) n.textContent = msg || ''; }
+  function off(msg) {
+    v.pause(); v.hidden = true; v.removeAttribute('src'); v.innerHTML = '';
+    try { v.load(); } catch (e) {}
+    if (objUrl) { URL.revokeObjectURL(objUrl); objUrl = ''; }
+    cur = ''; window.TSWVideoOk = false; note(msg);
+  }
+  function play() { var p = v.play(); if (p && p.catch) p.catch(function () { off('Your browser blocked the video from playing on its own.'); }); }
+  function sync() {
+    var o = window.TSWSky || {};
+    if (o.bg !== 'video') { if (cur) off(''); else note(''); return; }
+    if (still) { off('Video is off because your device asks for reduced motion.'); return; }
+    v.style.filter = 'brightness(' + ((o.vbright || 60) / 100) + ')';
+    var key = o.vsrc === 'mine' ? 'mine' : 'site';
+    if (key === cur) return;
+    off(''); cur = key; v.muted = true;
+    if (key === 'mine') {
+      tx('readonly', function (s) { return s.get(KEY); }).then(function (b) {
+        if (cur !== 'mine') return;
+        if (!b) { off('No video saved on this device yet. Choose one with the button above.'); return; }
+        objUrl = URL.createObjectURL(b); v.src = objUrl; v.load(); play();
+      }, function () { off('Your browser would not let TSW v2 use saved videos here.'); });
+    } else {
+      v.innerHTML = '<source src="/bg-video.mp4" type="video/mp4"><source src="/bg-video.webm" type="video/webm">';
+      v.lastChild.onerror = function () { if (cur === 'site') off('No site video has been added yet.'); };
+      v.load(); play();
+    }
+  }
+  v.addEventListener('playing', function () { v.hidden = false; window.TSWVideoOk = true; note(''); });
+  window.TSWVideoSync = sync;
+  window.TSWVideo = {
+    save: function (f) { return tx('readwrite', function (s) { return s.put(f, KEY); }); },
+    remove: function () { return tx('readwrite', function (s) { return s['delete'](KEY); }); },
+    reset: function () { off(''); sync(); }
+  };
+})();
+
+/* ===================== clock ===================== */
+(function () {
+  var clk = $('clock');
+  function paint() {
+    var mode = window.TSWClock || '12';
+    if (mode === 'off') { clk.hidden = true; return; }
+    clk.hidden = false;
+    var d = new Date();
+    clk.textContent = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: mode === '12' }) + '  \u00b7  ' +
+      d.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+  }
+  window.TSWClockRefresh = paint;
+  setInterval(paint, 10000); paint();
+})();
+
+/* ===================== opening animation ===================== */
+(function () {
+  var sp = $('splash'); if (!sp) return;
+  var seen = false; try { seen = sessionStorage.getItem('tsw.splash') === '1'; } catch (e) {}
+  if (seen || matchMedia('(prefers-reduced-motion: reduce)').matches) { sp.remove(); return; }
+  try { sessionStorage.setItem('tsw.splash', '1'); } catch (e) {}
+  var t0 = Date.now(), done = false;
+  function hide() {
+    if (done) return; done = true;
+    setTimeout(function () { sp.classList.add('out'); setTimeout(function () { if (sp.parentNode) sp.remove(); }, 650); }, Math.max(0, 900 - (Date.now() - t0)));
+  }
+  if (document.readyState === 'complete') hide(); else addEventListener('load', hide);
+  setTimeout(hide, 5000);
+})();
+
+/* ===================== server status + wake screen ===================== */
+/* Set STATUS_NOTICE to a short message to show the yellow "maintenance" state, e.g.
+   var STATUS_NOTICE = 'Maintenance tonight. Sites may fail.';
+   Set it back to '' to return to green. Red and green are detected automatically. */
+var STATUS_NOTICE = '';
+(function () {
+  var box = $('status'), text = $('status-text'), wake = $('wake'), wakeText = $('wake-p'), wakeX = $('wake-x');
+  var engineOk = null, pingOk = true, lastActive = Date.now(), lastPing = 0, waking = false, wakeId = 0;
+  function paint() {
+    var st, msg;
+    if (engineOk === false || !pingOk) { st = 'down'; msg = 'Proxy servers down'; }
+    else if (engineOk === null) { st = 'check'; msg = 'Checking server…'; }
+    else if (STATUS_NOTICE) { st = 'warn'; msg = STATUS_NOTICE; }
+    else { st = 'up'; msg = 'Active'; }
+    box.setAttribute('data-s', st); text.textContent = msg;
+  }
+  if (window.TSWEngine && window.TSWEngine.ready) {
+    Promise.resolve(window.TSWEngine.ready).then(function () { engineOk = true; paint(); },
+                                                 function () { engineOk = false; paint(); });
+  } else { engineOk = false; }
+
+  /* Asks the server for one of its own files, so Render's loading page does not count as "up". */
+  function check() {
+    var ctl = new AbortController(), t = setTimeout(function () { ctl.abort(); }, 10000), t0 = performance.now();
+    return fetch('/register-sw.js', { cache: 'no-store', signal: ctl.signal })
+      .then(function (r) { return r.ok ? r.text() : Promise.reject(); })
+      .then(function (txt) { clearTimeout(t); lastMs = Math.round(performance.now() - t0); return txt.indexOf('registerSW') > -1; })
+      .catch(function () { clearTimeout(t); return false; });
+  }
+  /* ---- history of checks, kept in this browser only ---- */
+  var lastMs = 0, HKEY = 'tsw.hist', lastRec = 0, lastOk = null;
+  function hist() { var l = store.get(HKEY, []); return Array.isArray(l) ? l : []; }
+  function record(ok, ms) {
+    var now = Date.now();
+    if (lastOk === ok && now - lastRec < 240000) return;
+    lastOk = ok; lastRec = now;
+    var l = hist(); l.push({ t: now, ok: ok ? 1 : 0, ms: ms || 0 });
+    if (l.length > 300) l = l.slice(l.length - 300);
+    store.set(HKEY, l); renderHist();
+  }
+  function renderHist() {
+    var bar = $('hist'), sum = $('hist-sum'); if (!bar || !sum) return;
+    var l = hist(), recent = l.filter(function (e) { return e.t >= Date.now() - 86400000; });
+    bar.innerHTML = '';
+    l.slice(-48).forEach(function (e) {
+      var i = document.createElement('i'); i.className = e.ok ? '' : 'bad';
+      i.title = new Date(e.t).toLocaleString() + (e.ok ? ' (' + e.ms + ' ms)' : ' (down)'); bar.appendChild(i);
+    });
+    if (!recent.length) { sum.textContent = 'No checks recorded yet. Checks happen while TSW v2 is open in this browser.'; return; }
+    var ups = recent.filter(function (e) { return e.ok; }), bad = recent.filter(function (e) { return !e.ok; });
+    var avg = ups.length ? Math.round(ups.reduce(function (a, e) { return a + e.ms; }, 0) / ups.length) : 0;
+    sum.textContent = 'Last 24 hours: ' + recent.length + ' checks, ' + Math.round(100 * ups.length / recent.length) + '% up' +
+      (avg ? ', average response ' + avg + ' ms' : '') + '. ' +
+      (bad.length ? 'Last problem: ' + new Date(bad[bad.length - 1].t).toLocaleString() + '.' : 'No problems seen.');
+  }
+  window.TSWRenderHistory = renderHist;
+  window.TSWClearHistory = function () { store.del(HKEY); lastOk = null; renderHist(); };
+  function startWake() {
+    if (waking) return;
+    waking = true; var id = ++wakeId;
+    wake.hidden = false; wakeX.hidden = true;
+    wakeText.textContent = 'This can take up to a minute. The page reloads by itself when it is ready.';
+    setTimeout(function () {
+      if (waking && id === wakeId) {
+        wakeText.textContent = 'Still trying. If this keeps going, the server may be down or you may be offline.';
+        wakeX.hidden = false;
+      }
+    }, 90000);
+    (function retry() {
+      if (!waking || id !== wakeId) return;
+      check().then(function (ok) {
+        if (!waking || id !== wakeId) return;
+        if (ok) location.reload(); else setTimeout(retry, 4000);
+      });
+    })();
+  }
+  wakeX.addEventListener('click', function () { waking = false; wakeId++; wake.hidden = true; });
+  function ping() {
+    lastPing = Date.now();
+    check().then(function (ok) { pingOk = ok; paint(); record(ok, lastMs); if (!ok) startWake(); });
+  }
+  /* Only ping while the tab is open, visible and recently used, so an old forgotten tab
+     does not keep the free server awake and use up its monthly hours. */
+  function activity() {
+    lastActive = Date.now();
+    if (!waking && Date.now() - lastPing > 60000 && document.visibilityState === 'visible') ping();
+  }
+  ['pointerdown', 'keydown', 'touchstart'].forEach(function (ev) { addEventListener(ev, activity, { passive: true }); });
+  setInterval(function () {
+    if (document.visibilityState === 'visible' && Date.now() - lastActive < 600000 && Date.now() - lastPing >= 60000) ping();
+  }, 30000);
+  ping(); paint();
+})();
+
+/* ===================== server info panel ===================== */
+(function () {
+  var ov = $('info'), pill = $('status'), busy = false;
+  function fmt(ms) { return ms == null ? 'Unavailable' : Math.round(ms) + ' ms'; }
+  function dur(sec) {
+    sec = Math.round(sec); var d = Math.floor(sec / 86400), h = Math.floor(sec % 86400 / 3600), m = Math.floor(sec % 3600 / 60);
+    return d ? d + 'd ' + h + 'h' : h ? h + 'h ' + m + 'm' : m ? m + 'm ' + (sec % 60) + 's' : sec + 's';
+  }
+  /* Time to open a WebSocket to the proxy's /wisp/ endpoint. */
+  function wispPing() {
+    return new Promise(function (resolve) {
+      var t0 = performance.now(), done = false, ws;
+      var url = (location.protocol === 'https:' ? 'wss' : 'ws') + '://' + location.host + '/wisp/';
+      try { ws = new WebSocket(url); } catch (e) { return resolve(null); }
+      var to = setTimeout(function () { if (!done) { done = true; try { ws.close(); } catch (e) {} resolve(null); } }, 8000);
+      ws.onopen = function () { if (done) return; done = true; clearTimeout(to); var ms = performance.now() - t0; try { ws.close(); } catch (e) {} resolve(ms); };
+      ws.onerror = function () { if (done) return; done = true; clearTimeout(to); resolve(null); };
+    });
+  }
+  function measure() {
+    if (busy) return; busy = true;
+    $('i-status').textContent = $('status-text').textContent;
+    ['i-rtt', 'i-ping', 'i-ip', 'i-up'].forEach(function (id) { $(id).textContent = 'Measuring...'; });
+    var best = null, info = null;
+    function one() {
+      var t0 = performance.now();
+      return fetch('/api/info', { cache: 'no-store' }).then(function (r) {
+        var dt = performance.now() - t0;
+        if (!r.ok) throw new Error('missing');
+        return r.json().then(function (j) { info = j; if (best === null || dt < best) best = dt; });
+      });
+    }
+    one().then(one).then(one).catch(function () {
+      info = null;   /* /api/info not installed on the server yet: time a normal file instead */
+      var t0 = performance.now();
+      return fetch('/register-sw.js', { cache: 'no-store' }).then(function () { best = performance.now() - t0; }, function () { best = null; });
+    }).then(function () {
+      $('i-rtt').textContent = fmt(best);
+      $('i-ip').textContent = info ? (info.ip || 'Could not look it up') : 'Not available yet';
+      $('i-up').textContent = info && typeof info.uptime === 'number' ? dur(info.uptime) : 'Not available yet';
+      return wispPing();
+    }).then(function (ms) { $('i-ping').textContent = fmt(ms); busy = false; });
+  }
+  function show() { ov.hidden = false; measure(); if (window.TSWRenderHistory) window.TSWRenderHistory(); }
+  pill.addEventListener('click', show);
+  pill.addEventListener('keydown', function (ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); show(); } });
+  $('i-refresh').addEventListener('click', measure);
+  $('i-clear').addEventListener('click', function () { if (window.TSWClearHistory) window.TSWClearHistory(); });
+})();
+
+/* ===================== change log panel ===================== */
+(function () {
+  var panel = document.getElementById('log'), openBtn = document.getElementById('logbtn');
+  function show() { panel.hidden = false; document.getElementById('log-close').focus(); }
+  function hide() { panel.hidden = true; openBtn.focus(); }
+  openBtn.addEventListener('click', show);
+  document.getElementById('log-close').addEventListener('click', hide);
+  panel.addEventListener('click', function (ev) { if (ev.target === panel) hide(); });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && !panel.hidden) hide(); });
+  panel.querySelectorAll('.tabs button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      panel.querySelectorAll('.tabs button').forEach(function (x) { x.classList.toggle('on', x === b); });
+      document.getElementById('tab-updates').hidden = b.dataset.tab !== 'updates';
+      document.getElementById('tab-credits').hidden = b.dataset.tab !== 'credits';
+    });
+  });
+})();
+
+/* ===================== settings ===================== */
+(function () {
+  var ov = $('settings');
+  var ENGINES = { ddg: 'https://duckduckgo.com/?q=', google: 'https://www.google.com/search?q=', bing: 'https://www.bing.com/search?q=',
+                  brave: 'https://search.brave.com/search?q=', startpage: 'https://www.startpage.com/sp/search?query=' };
+  var ACCENTS = { blue: '#5aa2ff', green: '#46d38a', pink: '#ff6fb1', orange: '#ff9a4d', violet: '#a78bfa' };
+  var BGS = ['stars', 'ice', 'aurora', 'city', 'ocean', 'solid', 'video'];
+  var ICONS = {
+    "default": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2305070f'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%235aa2ff'/%3E%3C/svg%3E",
+    doc: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M8 3h11l6 6v20H8z' fill='%23dfe5f0'/%3E%3Cpath d='M19 3v6h6z' fill='%23aab4c9'/%3E%3C/svg%3E",
+    globe: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='%235aa2ff' stroke-width='2.5'/%3E%3Cpath d='M4 16h24M16 4c-6 7-6 17 0 24M16 4c6 7 6 17 0 24' fill='none' stroke='%235aa2ff' stroke-width='2'/%3E%3C/svg%3E",
+    blank: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E"
+  };
+  var D = { engine: 'ddg', stars: true, shoot: true, title: '', icon: 'default', bg: 'stars', season: 'auto', solid: '#0a0f1c',
+            vsrc: 'site', vbright: 60, accent: 'blue', clock: '12' };
+  var cfg = {};
+  Object.keys(D).forEach(function (k) { cfg[k] = store.get('tsw.' + k, D[k]); });
+  if (!ENGINES[cfg.engine]) cfg.engine = 'ddg';
+  if (!ICONS[cfg.icon]) cfg.icon = 'default';
+  if (BGS.indexOf(cfg.bg) < 0) cfg.bg = 'stars';
+  if (['auto', 'snow', 'bats', 'off'].indexOf(cfg.season) < 0) cfg.season = 'auto';
+  if (!ACCENTS[cfg.accent]) cfg.accent = 'blue';
+  if (['12', '24', 'off'].indexOf(cfg.clock) < 0) cfg.clock = '12';
+  if (cfg.vsrc !== 'mine') cfg.vsrc = 'site';
+  cfg.vbright = Math.max(20, Math.min(100, parseInt(cfg.vbright, 10) || 60));
+  if (!/^#[0-9a-fA-F]{6}$/.test(cfg.solid)) cfg.solid = D.solid;
+
+  function mix(a, b, t) {
+    function p(hx) { return [1, 3, 5].map(function (i) { return parseInt(hx.substr(i, 2), 16); }); }
+    var x = p(a), y = p(b);
+    return '#' + x.map(function (v, i) { var n = Math.round(v + (y[i] - v) * t); return (n < 16 ? '0' : '') + n.toString(16); }).join('');
+  }
+  function apply() {
+    var c = ACCENTS[cfg.accent], root = document.documentElement.style;
+    root.setProperty('--blue', c); root.setProperty('--blue-dim', mix(c, '#000000', .45)); root.setProperty('--blue-hi', mix(c, '#ffffff', .25));
+    window.TSWSky = { stars: !!cfg.stars, shoot: !!cfg.shoot, bg: cfg.bg, season: cfg.season, solid: cfg.solid,
+                      vsrc: cfg.vsrc, vbright: cfg.vbright, accent: c };
+    window.TSWSearch = function () { return ENGINES[cfg.engine]; };
+    window.TSWClock = cfg.clock; if (window.TSWClockRefresh) window.TSWClockRefresh();
+    document.title = cfg.title || 'TSW v2';
+    $('fav').href = ICONS[cfg.icon];
+    if (window.TSWVideoSync) window.TSWVideoSync();
+  }
+  function put(k, v) { cfg[k] = v; store.set('tsw.' + k, v); apply(); }
+  function fill() {
+    $('set-engine').value = cfg.engine; $('set-bg').value = cfg.bg; $('set-season').value = cfg.season;
+    $('set-stars').checked = !!cfg.stars; $('set-shoot').checked = !!cfg.shoot;
+    $('set-title').value = cfg.title; $('set-icon').value = cfg.icon; $('set-solid').value = cfg.solid;
+    $('set-vsrc').value = cfg.vsrc; $('set-vbright').value = cfg.vbright; $('set-accent').value = cfg.accent; $('set-clock').value = cfg.clock;
+  }
+  $('set-engine').addEventListener('change', function () { put('engine', this.value); });
+  $('set-bg').addEventListener('change', function () {
+    cfg.bg = this.value;
+    if (cfg.bg === 'video') {
+      cfg.season = 'off';
+      cfg.stars = false;
+      cfg.shoot = false;
+      store.set('tsw.season', cfg.season);
+      store.set('tsw.stars', cfg.stars);
+      store.set('tsw.shoot', cfg.shoot);
+      $('set-season').value = cfg.season;
+      $('set-stars').checked = false;
+      $('set-shoot').checked = false;
+    }
+    store.set('tsw.bg', cfg.bg);
+    apply();
+  });
+  $('set-solid').addEventListener('input', function () { put('solid', this.value); });
+  $('set-vsrc').addEventListener('change', function () { put('vsrc', this.value); });
+  $('set-vbright').addEventListener('input', function () { put('vbright', parseInt(this.value, 10)); });
+  $('set-accent').addEventListener('change', function () { put('accent', this.value); });
+  $('set-clock').addEventListener('change', function () { put('clock', this.value); });
+  $('set-season').addEventListener('change', function () { put('season', this.value); });
+  $('set-stars').addEventListener('change', function () { put('stars', this.checked); });
+  $('set-shoot').addEventListener('change', function () { put('shoot', this.checked); });
+  $('set-title').addEventListener('input', function () { put('title', this.value.trim()); });
+  $('set-icon').addEventListener('change', function () { put('icon', this.value); });
+
+  /* the user's own video, saved on this device */
+  $('vid-file').addEventListener('change', function () {
+    var f = this.files && this.files[0]; this.value = '';
+    var note = $('vid-note');
+    if (!f) return;
+    if (!/^video\//.test(f.type)) { note.textContent = 'That file is not a video.'; return; }
+    if (f.size > 300 * 1024 * 1024) { note.textContent = 'That video is over 300 MB. Pick a shorter or smaller one.'; return; }
+    note.textContent = 'Saving ' + f.name + '...';
+    window.TSWVideo.save(f).then(function () {
+      cfg.vsrc = 'mine'; cfg.bg = 'video'; store.set('tsw.vsrc', 'mine'); store.set('tsw.bg', 'video');
+      fill(); apply(); window.TSWVideo.reset();
+      note.textContent = 'Saved ' + f.name + ' (' + (f.size / 1048576).toFixed(1) + ' MB).';
+    }, function () { note.textContent = 'Your browser would not let TSW v2 save the video here.'; });
+  });
+  $('vid-remove').addEventListener('click', function () {
+    window.TSWVideo.remove().then(function () { $('vid-note').textContent = 'Your saved video was removed.'; window.TSWVideo.reset(); },
+      function () { $('vid-note').textContent = 'Could not remove it.'; });
+  });
+
+  $('set-reset').addEventListener('click', function () {
+    Object.keys(D).forEach(function (k) { store.del('tsw.' + k); cfg[k] = D[k]; });
+    fill(); apply(); window.TSWVideo.reset();
+  });
+  $('cog').addEventListener('click', function () { fill(); ov.hidden = false; $('set-engine').focus(); });
+
+  /* install as an app (only offered by browsers that support it) */
+  var deferred = null;
+  addEventListener('beforeinstallprompt', function (ev) { ev.preventDefault(); deferred = ev; $('install-btn').hidden = false; });
+  addEventListener('appinstalled', function () { deferred = null; $('install-btn').hidden = true; });
+  $('install-btn').addEventListener('click', function () {
+    if (!deferred) return;
+    deferred.prompt();
+    deferred.userChoice.then(function () { deferred = null; $('install-btn').hidden = true; }, function () {});
+  });
+  apply();
+})();
+
+/* shared behaviour for the settings and add-shortcut panels */
+$('gamesbtn').addEventListener('click', function () { $('games').hidden = false; });
+$('games').addEventListener('click', function (ev) {
+  var b = ev.target.closest('[data-site]'); if (!b) return;
+  $('games').hidden = true; if (window.TSWOpen) window.TSWOpen(b.getAttribute('data-site'));
+});
+['settings', 'addlink', 'games', 'info'].forEach(function (id) {
+  var el = $(id);
+  el.addEventListener('click', function (ev) { if (ev.target === el || ev.target.closest('[data-close]')) el.hidden = true; });
+});
+document.addEventListener('keydown', function (ev) {
+  if (ev.key === 'Escape') { ['settings', 'addlink', 'games', 'info'].forEach(function (id) { $(id).hidden = true; }); }
+});
+
+/* ===================== your own shortcuts ===================== */
+(function () {
+  var links = $('links'), MAX = 8;
+  var plus = document.createElement('button');
+  plus.type = 'button'; plus.id = 'add-link'; plus.textContent = '+'; plus.title = 'Add a shortcut'; plus.setAttribute('aria-label', 'Add a shortcut');
+  function list() { var l = store.get('tsw.links', []); return Array.isArray(l) ? l : []; }
+  function render() {
+    links.querySelectorAll('.custom, #add-link').forEach(function (n) { n.remove(); });
+    var l = list();
+    l.forEach(function (item, i) {
+      var chip = document.createElement('span'); chip.className = 'chip custom';
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = item.name; b.setAttribute('data-url', item.url);
+      var x = document.createElement('button'); x.type = 'button'; x.className = 'x'; x.textContent = '×';
+      x.setAttribute('aria-label', 'Remove ' + item.name); x.setAttribute('data-remove', i);
+      chip.appendChild(b); chip.appendChild(x); links.appendChild(chip);
+    });
+    if (l.length < MAX) links.appendChild(plus);
+  }
+  function norm(t) {
+    t = t.trim(); if (!t) return '';
+    if (!/^https?:\/\//i.test(t)) t = 'https://' + t;
+    try { var u = new URL(t); return u.hostname.indexOf('.') > 0 ? u.href : ''; } catch (e) { return ''; }
+  }
+  plus.addEventListener('click', function () {
+    $('al-name').value = ''; $('al-url').value = ''; $('al-err').textContent = '';
+    $('addlink').hidden = false; $('al-name').focus();
+  });
+  links.addEventListener('click', function (ev) {
+    var x = ev.target.closest('button[data-remove]');
+    if (!x) return;
+    var l = list(); l.splice(parseInt(x.getAttribute('data-remove'), 10), 1); store.set('tsw.links', l); render();
+  });
+  $('al-form').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var url = norm($('al-url').value);
+    if (!url) { $('al-err').textContent = 'Enter a web address like youtube.com.'; return; }
+    var name = $('al-name').value.trim() || new URL(url).hostname.replace(/^www\./, '');
+    var l = list(); l.push({ name: name, url: url }); store.set('tsw.links', l);
+    $('addlink').hidden = true; render();
+  });
+  render();
+})();
+
+/* ===================== navigation UI ===================== */
+/*
+  PROXY ENGINE CONNECTION POINT
+  This file does not contain the proxy engine. The Scramjet connection (service worker,
+  transport, controller) is added in the next stage as /engine.js, which must define:
+
+    window.TSWEngine = {
+      ready:    Promise,                      // resolves when the service worker + transport are ready
+      open:     function (url, container),    // loads url inside container, returns a handle
+      back:     function () {},               // optional
+      forward:  function () {},               // optional
+      reload:   function () {},               // optional
+      onload:   function (cb) {},             // optional; cb(currentUrl) when a page finishes loading
+    };
+
+  Until that file exists, opening a site shows an honest "engine not connected" message.
+*/
+(function () {
+  var home = document.getElementById('home'), browse = document.getElementById('browse');
+  var homeForm = document.getElementById('home-form'), homeInput = document.getElementById('home-input');
+  var homeMsg = document.getElementById('home-msg');
+  var addr = document.getElementById('addr'), view = document.getElementById('view'), load = document.getElementById('load');
+  var bBack = document.getElementById('btn-back'), bFwd = document.getElementById('btn-fwd'), bRel = document.getElementById('btn-reload');
+  var engine = null, current = '';
+  var SEARCH = 'https://duckduckgo.com/?q=';
+
+  function toUrl(text) {
+    text = text.trim();
+    if (!text) return '';
+    if (/^https?:\/\//i.test(text)) return text;
+    if (!/\s/.test(text) && /^[^\s.]+\.[^\s]{2,}$/.test(text)) return 'https://' + text;
+    if (/^localhost(:\d+)?(\/|$)/i.test(text)) return 'http://' + text;
+    return (window.TSWSearch ? window.TSWSearch() : SEARCH) + encodeURIComponent(text);
+  }
+  var spinTimer, slowTimer, diag = document.getElementById('diag');
+  var FORM = 'https://docs.google.com/forms/d/e/1FAIpQLScupiUZuqQsngFai_QPQRWn06LpuZy3VGZOEyIUY0DAZ0qJxw/viewform';
+  function loading(on) {
+    load.classList.remove('on'); void load.offsetWidth;
+    if (on) load.classList.add('on');
+    bRel.classList.toggle('spinning', !!on);
+    clearTimeout(spinTimer);
+    if (on) spinTimer = setTimeout(function () { bRel.classList.remove('spinning'); }, 20000);
+  }
+  /* ---- friendly "why didn't it load" messages ---- */
+  var MSG = {
+    blocked: ['This site is probably blocking proxies', 'Sites with bot checks, logins, or video streaming often refuse traffic that comes from a server. Nothing is wrong with TSW v2. Try another site, or search for what you need instead.'],
+    unreachable: ['TSW v2 couldn\u2019t reach this site', 'The address may have a typo, the site may be down, or it may refuse connections from this server. Check the address and try again.'],
+    secure: ['A secure connection problem', 'The site\u2019s security check didn\u2019t go through the proxy. Reloading sometimes helps, but some sites will not work here.'],
+    server: ['TSW v2\u2019s server is having trouble', 'The proxy server looks down or is waking up. Wait a minute, then reload.'],
+    slow: ['This is taking a while', 'Heavy sites can load slowly on the free server. You can keep waiting, reload, or try another site.'],
+    error: ['Something went wrong loading this site', 'The proxy returned an error page. Reload once, and if it keeps happening, this is likely a site TSW v2 can\u2019t handle.'],
+    popup: ['Your browser blocked the new tab', 'Allow pop-ups for this site, or copy the address and paste it into a new tab.']
+  };
+  function hideDiag() { diag.hidden = true; }
+  function showDiag(kind, soft) {
+    var m = MSG[kind]; if (!m) return;
+    document.getElementById('diag-t').textContent = m[0]; document.getElementById('diag-p').textContent = m[1];
+    diag.classList.toggle('soft', !!soft); diag.hidden = false;
+  }
+  /* Looks at the page inside the frame. These are guesses from the page text, so the messages say "probably". */
+  function diagnose() {
+    if (document.getElementById('status').getAttribute('data-s') === 'down') return 'server';
+    var fr = view.querySelector('iframe'), txt = '', title = '';
+    try { var d = fr.contentDocument; txt = ((d.body && d.body.innerText) || '').slice(0, 3000); title = d.title || ''; } catch (e) { return null; }
+    if (txt.length > 2500) return null;   /* real pages are long; error pages are short */
+    var low = (title + ' ' + txt).toLowerCase();
+    if (/captcha|verify you are human|are you a robot|just a moment|access denied|forbidden|too many requests|unusual traffic|\b403\b|\b429\b/.test(low)) return 'blocked';
+    if (/err_name_not_resolved|name not resolved|enotfound|could not resolve|connection refused|econnrefused|timed out|etimedout|unreachable|failed to fetch|network error/.test(low)) return 'unreachable';
+    if (/certificate|\bssl\b|\btls\b|handshake/.test(low)) return 'secure';
+    if (txt.length < 800 && /error|failed|went wrong|couldn.t|cannot|can.t/.test(low)) return 'error';
+    return null;
+  }
+  function openTab() {
+    var u = current || addr.value; if (!u) return;
+    var w = window.open(location.origin + '/?go=' + encodeURIComponent(u), '_blank');
+    if (!w) showDiag('popup', true);
+  }
+  function fail(title, body) {
+    loading(false); clearTimeout(slowTimer);
+    view.innerHTML = '';
+    var box = document.createElement('div'); box.className = 'fail';
+    var inner = document.createElement('div');
+    var h = document.createElement('h2'); h.textContent = title;
+    var p = document.createElement('p'); p.textContent = body;
+    var b = document.createElement('button'); b.textContent = 'Back to home';
+    b.onclick = goHome;
+    inner.append(h, p, b); box.append(inner); view.append(box);
+  }
+  function setNav() {
+    var e = window.TSWEngine;
+    bBack.disabled = !(e && e.back); bFwd.disabled = !(e && e.forward); bRel.disabled = !(e && e.reload);
+    document.getElementById('btn-newtab').disabled = !e;
+  }
+  function open(text) {
+    var url = toUrl(text);
+    if (!url) return;
+    try { new URL(url); } catch (_) { homeMsg.textContent = 'That doesn\u2019t look like a valid address.'; return; }
+    current = url; addr.value = url;
+    home.hidden = true; browse.hidden = false; setNav(); loading(true);
+    hideDiag(); clearTimeout(slowTimer); slowTimer = setTimeout(function () { showDiag('slow', true); }, 30000);
+    var e = window.TSWEngine;
+    if (!e) { fail('The proxy engine isn\u2019t connected yet', 'This page is the TSW v2 interface only. The Scramjet engine is added in the next build stage.'); return; }
+    Promise.resolve(e.ready).then(function () {
+      engine = e.open(url, view);
+      if (e.onload) e.onload(function (u) {
+        loading(false); clearTimeout(slowTimer);
+        if (u) { current = u; addr.value = u; }
+        setTimeout(function () { var k = diagnose(); if (k) showDiag(k); else hideDiag(); }, 500);
+      });
+      else setTimeout(function () { loading(false); }, 1500);
+    }).catch(function (err) {
+      fail('Couldn\u2019t start the proxy', (err && err.message ? err.message + ' ' : '') +
+        'If the server was asleep, wait a minute and try again. Your browser also needs service workers enabled.');
+    });
+  }
+  function goHome() {
+    browse.hidden = true; home.hidden = false; view.innerHTML = ''; loading(false); hideDiag(); clearTimeout(slowTimer);
+    homeInput.value = ''; homeMsg.textContent = ''; if (online()) homeInput.focus();
+  }
+
+  var field = document.querySelector('.field'), toast = document.getElementById('toast'), toastTimer;
+  function online() { return !!window.TSWEngine; }   /* the search bar switches on by itself once /engine.js defines TSWEngine */
+  function shake(el) { el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
+  function syncField() {
+    var on = online();
+    field.classList.toggle('off', !on);
+    document.getElementById('links').classList.toggle('off', !on);
+    homeInput.readOnly = !on;
+    field.querySelector('.go').setAttribute('aria-disabled', String(!on));
+  }
+  function down() {
+    homeMsg.textContent = 'Web proxy down. Try again later.';
+    shake(field); shake(homeMsg);
+  }
+  field.addEventListener('mousedown', function (ev) { if (!online()) { ev.preventDefault(); down(); } });
+  field.addEventListener('touchstart', function () { if (!online()) down(); }, { passive: true });
+  document.getElementById('links').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button[data-url]');
+    if (!b) return;
+    if (!online()) { down(); return; }
+    open(b.getAttribute('data-url'));
+  });
+  syncField();
+  window.addEventListener('load', syncField);
+  homeForm.addEventListener('submit', function (ev) { ev.preventDefault(); if (!online()) { down(); return; } open(homeInput.value); });
+  addr.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') open(addr.value); });
+  addr.addEventListener('focus', function () { addr.select(); });
+  document.getElementById('btn-home').onclick = goHome;
+  bBack.onclick = function () { var e = window.TSWEngine; if (e && e.back) { hideDiag(); loading(true); e.back(); } };
+  bFwd.onclick = function () { var e = window.TSWEngine; if (e && e.forward) { loading(true); e.forward(); } };
+  bRel.onclick = function () { var e = window.TSWEngine; if (e && e.reload) { hideDiag(); loading(true); e.reload(); } };
+  document.getElementById('btn-newtab').onclick = openTab;
+  document.getElementById('diag-x').onclick = hideDiag;
+  document.getElementById('diag-reload').onclick = function () { var e = window.TSWEngine; hideDiag(); if (e && e.reload) { loading(true); e.reload(); } };
+  document.getElementById('diag-tab').onclick = openTab;
+  document.getElementById('diag-report').addEventListener('click', function () {
+    try { if (navigator.clipboard && current) navigator.clipboard.writeText(current); } catch (e) {}
+    document.getElementById('diag-p').textContent = 'The site address was copied if your browser allowed it. Paste it into the form.';
+  });
+  /* "Open in new tab" links look like /?go=<address> */
+  var goParam = new URLSearchParams(location.search).get('go');
+  if (goParam) {
+    try { history.replaceState(null, '', location.pathname); } catch (e) {}
+    if (online()) open(goParam); else down();
+  }
+  window.TSWOpen = function (u) { if (!online()) { down(); return; } open(u); };
+})();
+</script>
+</body>
+</html>
